@@ -4,6 +4,9 @@
 #include "abstract.hpp"
 
 namespace Abstract {
+	/** @brief Interface for types supporting calls to update through CRTP.
+	 * @tparam T The derived type of the implementation class
+	 */
 	template<typename T>
 	struct Updatable: derived<T> {
 		int update(void) {
