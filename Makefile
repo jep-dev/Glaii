@@ -71,8 +71,8 @@ override NAMES_LIB+=$(foreach F,$(SRCS_LIB),$(call TO_NAME,$(F)))
 
 override CXXFLAGS+=$(ROOTS_INC:%=-I%) $$(pkg-config --cflags $(REQ_ALL))
 override LDLIBS+=$(pkg-config --libs $(REQ_ALL)) -lm -lglbinding -ldl
-override LDFLAGS+=-Wl,-rpath,$(ROOT_LIB):$(ROOT_OBJ)
-
+# override LDFLAGS+=-Wl,-rpath,$(realpath $(ROOT_LIB)):$(realpath $(ROOT_OBJ))
+override LDFLAGS+=-Wl,-rpath,$(realpath $(ROOT_LIB))
 TARGET?=$(call TO_BIN,$(firstword $(SRCS_BIN)))
 default: $(TARGET) $(COMPLETE)
 
