@@ -12,13 +12,12 @@ namespace View {
 	using namespace gl;
 	using namespace glbinding;
 
-	struct Window;
-
 	using Attrib = std::tuple<const SDL_GLattr, const int, int>;
 	Attrib attrib(SDL_GLattr k, int v) {
 		return std::make_tuple(k, v, v);
 	}
 
+	/** @brief RAII and operations for SDL-authored window/context pair. */
 	struct Window: Abstract::Updatable<Window> {
 	protected:
 		SDL_Window *win;

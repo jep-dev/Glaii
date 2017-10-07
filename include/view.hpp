@@ -9,6 +9,7 @@
 #include "streams.hpp"
 
 namespace Streams {
+	/** @brief Deque of non-empty strings interpreted as errors. */
 	struct ErrorFIFO: std::deque<std::string> {
 		operator bool(void) const {
 			return size();
