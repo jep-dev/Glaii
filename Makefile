@@ -109,4 +109,5 @@ clean-%:; @rm -i -f $(wildcard $* $(call TO_FILES,$*,$(VARS_OUT)))
 clean: $(foreach X,$(NAMES_BIN) $(NAMES_LIB) $(COMPLETE),clean-$(X))
 .PHONY: var-% clean-% clean
 
+include Doxygen.mk
 include $(wildcard $(foreach N,$(NAMES_BIN) $(NAMES_LIB),$(call TO_DEP,$(N))))
