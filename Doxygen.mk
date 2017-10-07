@@ -37,5 +37,6 @@ $(doc_file): Doxygen.mk $(call TO_OBJ,$(NAMES_LIB) $(NAMES_BIN)) $(DOXY_INPUT)
 		echo $(V_DOXY_REPLACEMENT) >> $(doc_file)
 
 doc: Doxygen.mk $(doc_file)
+	@$(doxygen) $(doc_file) >/dev/null
 clean-doc:; $(RM) $(doc_file)
 .PHONY: doc clean-doc
