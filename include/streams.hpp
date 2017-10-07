@@ -1,9 +1,7 @@
 #ifndef STREAMS_HPP
 #define STREAMS_HPP
 
-
 #include <iosfwd>
-// #include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <iosfwd>
@@ -18,6 +16,7 @@ namespace Streams {
 	using std::ostream;
 	using std::ostringstream;
 
+	/** @brief Reads entire ifstream into memory. */
 	struct Source {
 		const string data;
 		operator const char*(void) const;
