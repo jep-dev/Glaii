@@ -1,0 +1,1 @@
+-std=c++11 -Iapp/ -Iinclude/ -D_REENTRANT -I/usr/include/SDL2
