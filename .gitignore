@@ -32,3 +32,13 @@
 *.app
 bin/*
 !.sentinel
+
+# Transient files
+*.bak
+*.swp
+*.swo
+
+# Generated documentation
+doc/html/*
+doc/man/*
+doc/latex/*
