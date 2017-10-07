@@ -8,20 +8,25 @@
 namespace Abstract {
 
 	/*-- CRTP helper types --*/
+	/** @brief Helper type analogous to null-terminator for strings. */
 	struct null_type {};
+	/** @brief Helper type used to induce substitution failure in SFINAE. */
 	template<typename> struct enable;
+	/** @brief Helper type using CRTP for compile-time polymorphism. */
 	template<typename> struct derived;
+	/** @brief Helper type giving a per-type UID to instances. */
 	template<typename T, typename = T> struct tag_id;
+	/** @brief General-purpose tag encapsulator. */
 	template<typename = null_type> struct tag_type {};
+	/** @brief Interface contract used in combination with enable type. */
 	template<typename S, typename... T> struct intf_require;
 
-	/*-- Memory management --*/
-	template<typename T> struct managed;
-
 	/*-- Value reductions --*/
+	/** @brief Variadic template OR type (base case). */
 	template<bool...>
 	struct any_true: std::false_type {};
 
+	/** @brief Variadic template OR type (induction). */
 	template<bool B1, bool... BN>
 	struct any_true<B1, BN...>: std::conditional<B1,
 		std::true_type, any_true<BN...>> {};
@@ -60,16 +65,7 @@ namespace Abstract {
 			return t.get_id();
 		}
 	};
-	/*template<typename T>
-	struct managed: tag_id<managed<T>> {
-		T data;
-		bool manage;
-		void (*dtor) (T);
-		operator T(void) const { return data; }
-		managed(T t, bool manage, void (*fn)(T) = nullptr):
-			data(t), manage(data && manage && dtor), dtor(fn) {}
-		virtual ~managed(void) { if(manage) dtor(data); }
-	};*/
+
 	template<typename S>
 	unsigned get_id(S const& s) {
 		return S::get_id(s);
