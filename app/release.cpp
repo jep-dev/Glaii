@@ -42,8 +42,8 @@ bool run(std::ostream &dest, int n_frames) {
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
 	if(p[0].source(Source(GLSL_VERT)).compile()
-			&& p[1].source(Source(GLSL_FRAG)).compile() && p.build()) {
-		glUseProgram(p.program);
+			&& p[1].source(Source(GLSL_FRAG)).compile()) {
+		win << p;
 	} else {
 		dest << p.info();
 		return false;
