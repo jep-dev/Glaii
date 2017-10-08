@@ -32,7 +32,23 @@ namespace View {
 		friend std::ostream&
 		operator<<(std::ostream &dest, Window const& src);
 		template<GLenum E0, GLenum... EN>
-		Window& operator<<(Shaders::Program<E0,EN...> const& p);
+		Window& operator<<(Shaders::Program<E0,EN...> const& p) {
+			using namespace Shaders;
+			Shader const& prog = p.program;
+			do {
+				if(!(prog.is_program)) break;
+				bool cont = true;
+				for(GLenum iv : {GL_LINK_STATUS, GL_ATTACHED_SHADERS})
+					if(!prog(iv, int(GL_TRUE))) {
+						endl(std::cout << "Invalid shader program");
+						cont = false;
+						break;
+					}
+				if(cont) glUseProgram(prog);
+			} while(0);
+			errors();
+			return *this;
+		}
 		bool validate(void);
 		bool handle(SDL_WindowEvent const& ev);
 		bool handle(SDL_KeyboardEvent const& ev);
@@ -78,8 +94,10 @@ namespace View {
 						break;
 					}
 				}
+				live = true;
 				return;
 			} while(0);
+			live = false;
 		}
 	};
 }
