@@ -61,6 +61,9 @@ namespace View {
 			static constexpr auto N = sizeof...(EN)+1;
 			Shader program = {}, shaders[N] = {{E0}, {EN}...};
 			const GLenum types[N] = {E0, EN...};
+			operator GLuint(void) const {
+				return program;
+			}
 			Shader& operator[](unsigned index) {
 				return shaders[index];
 			}
