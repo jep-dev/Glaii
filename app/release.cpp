@@ -50,14 +50,12 @@ bool run(std::ostream &dest, int n_frames) {
 	}
 
 	unsigned frame = 0;
-	endl(dest << "Rendering... ");
 	auto pre = (*ctr)();
 	while(win.draw()) {
 		auto post = (*ctr)();
-		if(++frame % 4 == 0) {
-			auto dt = post - pre;
-			if(dt) flush(dest << "\rFPS: " << (*freq)()/float(dt));
-		}
+		auto dt = post - pre;
+		if(dt) flush(dest << "\rFPS[" << ++frame << "] = "
+			<< (*freq)()/float(dt));
 		pre = post;
 	}
 	/*for(auto i = 0; i < n_frames; i++) {
