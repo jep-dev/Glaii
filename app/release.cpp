@@ -6,52 +6,70 @@
 #include "glsl.hpp"
 #include "window.hpp"
 
+#ifndef GLSL_ROOT
+#define GLSL_ROOT "share/"
+#endif
+
+#ifndef GLSL_VERT
+#define GLSL_VERT GLSL_ROOT "default.vert"
+#endif
+
+#ifndef GLSL_FRAG
+#define GLSL_FRAG GLSL_ROOT "default.frag"
+#endif
+
+#ifndef CTX
+#define CTX(X) SDL_GL_CONTEXT_ ## X
+#endif
+
 bool run(std::ostream &dest, int n_frames) {
 	using namespace View;
 	using namespace Shaders;
 	static constexpr auto
-			iv_cmp = GL_COMPILE_STATUS, iv_link = GL_LINK_STATUS,
-			iv_del = GL_DELETE_STATUS,  iv_log = GL_INFO_LOG_LENGTH;
+		iv_cmp = GL_COMPILE_STATUS, iv_link = GL_LINK_STATUS,
+		iv_del = GL_DELETE_STATUS,  iv_log = GL_INFO_LOG_LENGTH;
+	static constexpr auto ctr = SDL_GetPerformanceCounter,
+		freq = SDL_GetPerformanceFrequency;
 
-	ErrorFIFO fifo;
 	Window win("Title", 640, 480, SDL_WINDOW_RESIZABLE,
-		attrib(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE),
-		attrib(SDL_GL_CONTEXT_MAJOR_VERSION, 3),
-		attrib(SDL_GL_CONTEXT_MAJOR_VERSION, 3),
+		attrib(CTX(PROFILE_MASK), CTX(PROFILE_CORE)),
+		attrib(CTX(MAJOR_VERSION), 3), attrib(CTX(MINOR_VERSION), 3),
 		attrib(SDL_GL_DOUBLEBUFFER, 1));
-	if(!win) return false;
+	if(!win) {
+		dest << win;
+		return false;
+	}
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
-	auto &prog = p.program;
-	const char *fnames[] = {"share/default.vert", "share/default.frag"};
-	int cont = true;
-	for(auto i = 0; i < 2; i++) {
-		auto& shader = p.shaders[i];
-		Source src = {fnames[i]};
-		if(!(cont = shader.source(src.data)))
-			endl(dest << "Could not use source " << fnames[i]);
-		else if(!(cont = shader.compile()))
-			endl(dest << "Could not compile " << fnames[i]);
-		else cont = prog.attach(shader);
-		auto info = shader.info();
-		if(info.size()) endl(dest << info);
-		if(!cont) break;
+	if(p[0].source(Source(GLSL_VERT)).compile()
+			&& p[1].source(Source(GLSL_FRAG)).compile() && p.build()) {
+		glUseProgram(p.program);
+	} else {
+		dest << p.info();
+		return false;
 	}
-	if(cont) {
-		cont = prog.link() && prog.validate();
-		auto info = prog.info();
-		if(info.size()) endl(dest << info);
+
+	unsigned frame = 0;
+	endl(dest << "Rendering... ");
+	auto pre = (*ctr)();
+	while(win.draw()) {
+		auto post = (*ctr)();
+		if(++frame % 4 == 0) {
+			auto dt = post - pre;
+			if(dt) flush(dest << "\rFPS: " << (*freq)()/float(dt));
+		}
+		pre = post;
 	}
-	if(cont) glUseProgram(prog);
-	if(fifo()) endl(dest << fifo);
-	flush(dest << "Rendering...");
-	for(auto i = 0; i < n_frames; i++)
-		if(!(cont = win.draw())) {
-			endl(dest << " exited after " << (i+1) << '/'
+	/*for(auto i = 0; i < n_frames; i++) {
+		if(!win.draw()) {
+			endl(dest << "exited after " << (i+1) << '/'
 				<< (n_frames) << " frames.");
 			break;
+		} else {
+		//
 		}
-	dest << win;
+	}*/
+	dest << '\n' << win;
 	return win.validate();
 }
 
@@ -64,7 +82,7 @@ int main(int argc, const char *argv[]) {
 		started = (SDL_Init(modules), SDL_WasInit(0) & modules);
 	if(init = (modules == started)) {
 		cout << "Beginning test." << endl;
-		cout << ' ' << (run(cout, 30) ? "Passed" : "Failed")
+		cout << (run(cout, 30) ? "Passed" : "Failed")
 			<< " test." << endl;
 	} else init_err = 1, cout << "abort." << endl;
 	SDL_Quit();
