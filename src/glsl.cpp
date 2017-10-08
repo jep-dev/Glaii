@@ -11,11 +11,11 @@ namespace Shaders {
 		return glGetProgramiv(id, k, dest), *dest;
 	}
 	Shader::operator GLuint(void) const { return id; }
-	bool Shader::source(std::string const& s) const {
-		if(!is_shader) return false;
+	Shader& Shader::source(std::string const& s) {
+		if(!is_shader) return *this;
 		auto sc = s.c_str();
-		return (glShaderSource(id, 1, &sc, NULL),
-			(*this)(GL_SHADER_SOURCE_LENGTH));
+		glShaderSource(id, 1, &sc, NULL);
+		return *this;
 	}
 	bool Shader::compile(void) const {
 		return is_shader && (*this)(GL_SHADER_SOURCE_LENGTH)
@@ -24,8 +24,9 @@ namespace Shaders {
 	}
 	bool Shader::attach(GLuint s) const {
 		if(!is_program || !glIsShader(s)) return false;
-		return (*this)(GL_ATTACHED_SHADERS) < (glAttachShader(id,s),
-			(*this)(GL_ATTACHED_SHADERS));
+		auto pre = (*this)(GL_ATTACHED_SHADERS);
+		glAttachShader(id, s);
+		return (*this)(GL_ATTACHED_SHADERS, pre + 1);
 	}
 	bool Shader::link(void) const {
 		return is_program && (glLinkProgram(id),

@@ -39,13 +39,13 @@ namespace View {
 		struct Shader {
 		protected:
 			const GLuint id;
+		public:
 			const GLboolean is_program = glIsProgram(id),
 				is_shader = glIsShader(id);
-		public:
 			operator GLuint(void) const;
 			GLint operator()(GLenum i) const;
 			bool operator()(GLenum i, int match) const;
-			bool source(std::string const& s) const;
+			Shader& source(std::string const& s);
 			bool compile(void) const;
 			bool attach(GLuint s) const;
 			bool link(void) const;
@@ -61,6 +61,34 @@ namespace View {
 			static constexpr auto N = sizeof...(EN)+1;
 			Shader program = {}, shaders[N] = {{E0}, {EN}...};
 			const GLenum types[N] = {E0, EN...};
+			Shader& operator[](unsigned index) {
+				return shaders[index];
+			}
+			Shader const& operator[](unsigned index) const {
+				return shaders[index];
+			}
+			bool attach(void) {
+				bool ret = true;
+				for(auto i = 0; i < N; i++)
+					ret &= program.attach(shaders[i]);
+				return ret;
+			}
+			bool link(void) {
+				return program.link();
+			}
+			bool validate(void) {
+				return program.validate();
+			}
+			bool build(void) {
+				return attach() && link() && validate();
+			}
+			// TODO format each info entry to make origin clear
+			string info(void) const {
+				string out;
+				for(unsigned i = 0; i < N; i++)
+					out += shaders[i].info();
+				return out + program.info();
+			}
 		};
 	}
 
