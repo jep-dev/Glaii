@@ -48,15 +48,15 @@ namespace View {
 			default: return true;
 		}
 	}
-	bool Window::update(void) {
+	bool Window::update(unsigned frame) {
 		if(!validate()) return false;
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev))
 			if(!handle(ev)) return false;
 		return validate();
 	}
-	bool Window::draw(void) {
-		if(!update()) return false;
+	bool Window::draw(unsigned frame) {
+		if(!update(frame)) return false;
 		SDL_GL_SwapWindow(win);
 		SDL_Delay(100);
 		return validate();
