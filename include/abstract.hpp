@@ -2,6 +2,7 @@
 #define ABSTRACT_HPP
 
 #include <functional>
+#include <type_traits>
 // #include <algorithm>
 #include <iosfwd>
 
@@ -16,8 +17,13 @@ namespace Abstract {
 	template<typename> struct derived;
 	/** @brief Helper type giving a per-type UID to instances. */
 	template<typename T, typename = T> struct tag_id;
-	/** @brief General-purpose tag encapsulator. */
+	/** @brief General-purpose type label/tag. */
 	template<typename = null_type> struct tag_type {};
+	/** @brief Alias for integral constant to match tag_ pattern */
+	//template<typename R, typename S = decltype(R::value), S T = R::value>
+	template<typename R, R T>
+	using tag_value = std::integral_constant<R,T>;
+
 	/** @brief Interface contract used in combination with enable type. */
 	template<typename S, typename... T> struct intf_require;
 
@@ -44,6 +50,9 @@ namespace Abstract {
 	template<typename D>
 	struct derived {
 		typedef D derived_type;
+		D const& get_derived(void) const {
+			return *static_cast<D *const>(this);
+		}
 		D& get_derived(void) {
 			return *static_cast<D*>(this);
 		}
