@@ -3,7 +3,6 @@
 
 #include "view.hpp"
 #include "glsl.hpp"
-#include "runnable.hpp"
 #include <glbinding/Binding.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_timer.h>
@@ -11,6 +10,12 @@
 namespace View {
 	using namespace gl;
 	using namespace glbinding;
+	struct Window;
+}
+
+#include "runnable.hpp"
+
+namespace View {
 
 	using Attrib = std::tuple<const SDL_GLattr, const int, int>;
 	Attrib attrib(SDL_GLattr k, int v) {
@@ -19,12 +24,15 @@ namespace View {
 
 	/** @brief RAII and operations for SDL-authored window/context pair. */
 	struct Window: Abstract::Updatable<Window> {
+	// Abstract::Handler<SDL_WindowEvent, SDL_KeyboardEvent, SDL_{
 	protected:
 		SDL_Window *win;
 		Streams::ErrorFIFO errors;
 		SDL_GLContext ctx;
 		bool live;
 	public:
+		typedef Window derived_type;
+		using Abstract::Updatable<Window>::get_derived;
 		operator bool(void) const;
 		operator SDL_Window *const(void) const;
 		operator SDL_GLContext const(void) const;
@@ -47,11 +55,13 @@ namespace View {
 			}*/
 		}
 		bool validate(void);
+
 		bool handle(SDL_WindowEvent const& ev);
 		bool handle(SDL_KeyboardEvent const& ev);
 		bool handle(SDL_Event const& ev);
-		bool update(void);
-		bool draw(void);
+
+		bool update(unsigned frame);
+		bool draw(unsigned frame);
 		template<typename... S>
 		Window(const char *title, int w, int h,
 				Uint32 flags, S &&... attribs) {
