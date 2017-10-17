@@ -6,6 +6,9 @@
 #include "glsl.hpp"
 #include "window.hpp"
 
+#include "models.hpp"
+#include "geometry.hpp"
+
 #ifndef GLSL_ROOT
 #define GLSL_ROOT "share/"
 #endif
@@ -42,31 +45,25 @@ bool run(std::ostream &dest, int n_frames) {
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
 	if(p[0].source(Source(GLSL_VERT)).compile()
-			&& p[1].source(Source(GLSL_FRAG)).compile()) {
+			&& p[1].source(Source(GLSL_FRAG)).compile())
 		win << p;
-	} else {
-		dest << p.info();
-		return false;
-	}
+	else return dest << p.info(), false;
 
+		//bool test = update(win);
 	unsigned frame = 0;
-	auto pre = (*ctr)();
-	while(win.draw()) {
+	while(win) {
+		//bool test = update(win, frame);
+		//return test;
+		auto pre = (*ctr)();
+		if(!win.draw(frame)) break;
 		auto post = (*ctr)();
+		auto tps = (*freq)();
 		auto dt = post - pre;
-		if(dt) flush(dest << "\rFPS[" << ++frame << "] = "
-			<< (*freq)()/float(dt));
-		pre = post;
+		if(dt <= 0) continue;
+		auto fps = tps / float(dt);
+		flush(dest << "\rFPS[" << frame << "] = " << fps);
+		frame++;
 	}
-	/*for(auto i = 0; i < n_frames; i++) {
-		if(!win.draw()) {
-			endl(dest << "exited after " << (i+1) << '/'
-				<< (n_frames) << " frames.");
-			break;
-		} else {
-		//
-		}
-	}*/
 	dest << '\n' << win;
 	return win.validate();
 }
@@ -75,6 +72,7 @@ int main(int argc, const char *argv[]) {
 	using namespace View;
 	using std::cout;
 	using std::endl;
+
 	int init = 0, init_err = 0, ran = 0, run_err = 0,
 		modules = SDL_INIT_VIDEO, n_frames = 20,
 		started = (SDL_Init(modules), SDL_WasInit(0) & modules);
