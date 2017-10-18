@@ -3,8 +3,13 @@
 
 #include <functional>
 #include <type_traits>
-// #include <algorithm>
 #include <iosfwd>
+
+// Deduce type from expression, generally for template arg defaults
+// TODO more generalized deductions than just infix operators?
+#ifndef COMBINE
+#define COMBINE(X,OP,Y) decltype(std::declval<X>() OP std::declval<Y>())
+#endif
 
 namespace Abstract {
 
