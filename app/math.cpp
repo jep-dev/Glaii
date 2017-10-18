@@ -1,4 +1,4 @@
-#include "models.hpp"
+#include "geometry.hpp"
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -11,7 +11,7 @@ using std::endl;
 using std::setw;
 using std::setprecision;
 
-using namespace Models;
+using namespace Geometry;
 
 std::ostream& table(std::ostream& dest) {
 	xyzw<float> x[] = {{0,0,0,1}, {1,0,0,0}, {0,1,0,0}, {0,0,1,0}};
@@ -35,24 +35,18 @@ int main(int argc, const char *argv[]) {
 	quat ident = {0,0,0,1};
 	table(cout);
 
-	quat xforms[] = {
-		quat{float(sin(M_PI/8)), 0, 0, float(cos(M_PI/8))},
-		rotate(float(M_PI/4), x)
+	std::map<const char*, quat> xforms = {
+		{"pi/2 . e_i", rotate(float(M_PI/2), x)},
+		{"pi/2 . e_j", rotate(float(M_PI/2), y)},
+		{"pi/2 . e_k", rotate(float(M_PI/2), z)}
 	};
-	std::cout << "xforms:\n [0] = " << xforms[0]
-		<< "\n [1] = " << xforms[1] << endl;
-	std::cout << " [1] - [0] = " << xforms[1]-xforms[0]
-		<< ";\n |[1]-[0]| ~= 0? " << std::boolalpha
-		<< near(xforms[0], xforms[1]) << endl;
-
-	/*for(auto && q :) {
-		cout << q << endl;
-		cout << "Natural: " << q << endl;
-		cout << "  [i]=" << q['i'] << "  [j]=" << q['j']
-			<< "  [k]=" << q['k'] << "  [1]=" << q['1'] << endl;
-		cout << "Near zero? " << std::boolalpha << near_zero(q['i'])
-			<< ", " << std::boolalpha << near_zero(q['j'])
-			<< ", " << std::boolalpha << near_zero(q['k'])
-			<< ", " << std::boolalpha << near_zero(q['1']) << endl;
-	}*/
+	for(auto const& kv : xforms) {
+		auto const& label = kv.first;
+		auto const& q = kv.second;
+		cout << "Rotation Q = " << label << ":\n  q   = " << q
+			<< "\n  q*  = " << *q << "\n  qq* = " << (q**q) << endl;
+		for(auto const& p : { x, y, z }) {
+			cout << "    p = " << p << " --> qpq* = " << q*p << endl;
+		}
+	}
 }
