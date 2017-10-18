@@ -6,8 +6,8 @@
 #include "glsl.hpp"
 #include "window.hpp"
 
-#include "models.hpp"
 #include "geometry.hpp"
+#include "model.hpp"
 
 #ifndef GLSL_ROOT
 #define GLSL_ROOT "share/"
