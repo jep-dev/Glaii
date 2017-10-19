@@ -11,22 +11,18 @@ namespace Abstract {
 	struct AbstractHandler: derived<T> {
 	private:
 		template<typename R>
-		bool handle(R && r, int) {
+		bool handle(R const& r, int) {
 			return get_derived().handle(r);
-		}
-		template<typename R>
-		bool handle(R && r, long) {
-			return true;
-		}
-		template<typename R>
-		bool handle(R && r, int) const {
-			return get_derived().handle(r);
-		}
-		template<typename R>
-		bool handle(R && r, long) const {
-			return true;
 		}
 	public:
+		template<typename R>
+		bool handle(R && r) const {
+			return handle(r, 0);
+		}
+		template<typename R>
+		bool handle(R const& r) const {
+			return handle(r, 0);
+		}
 	};
 
 }
