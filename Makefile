@@ -105,6 +105,7 @@ $(COMPLETE): $(call TO_OBJ,$(NAMES_LIB) $(NAMES_BIN))
 .PRECIOUS: %.d $(COMPLETE)
 
 var-%:; @echo '$$($*)=$($*)'
+# TODO - directories with the same name are targeted (thankfully an error)
 clean-%:; @rm -i -f $(wildcard $* $(call TO_FILES,$*,$(VARS_OUT)))
 clean: $(foreach X,$(NAMES_BIN) $(NAMES_LIB) $(COMPLETE),clean-$(X))
 .PHONY: var-% clean-% clean
