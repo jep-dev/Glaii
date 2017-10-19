@@ -5,7 +5,7 @@
 
 namespace Abstract {
 	/** @brief Interface for types supporting calls to update through CRTP.
-	 * #TODO @tparam T The derived type of the implementation class
+	 * TODO @tparam T The derived type of the implementation class
 	 */
 	template<typename S>
 	struct Updatable: derived<S> {
