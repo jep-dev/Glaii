@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <iosfwd>
-#include <sstream>
 #include <fstream>
 
 namespace Streams {
