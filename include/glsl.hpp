@@ -45,7 +45,7 @@ namespace View {
 			operator GLuint(void) const;
 			GLint operator()(GLenum i) const;
 			bool operator()(GLenum i, int match) const;
-			Shader& source(std::string const& s);
+			Shader const& source(std::string const& s) const;
 			bool compile(void) const;
 			bool attach(GLuint s) const;
 			bool link(void) const;
@@ -61,6 +61,9 @@ namespace View {
 			static constexpr auto N = sizeof...(EN)+1;
 			Shader program = {}, shaders[N] = {{E0}, {EN}...};
 			const GLenum types[N] = {E0, EN...};
+			GLint uniform(const GLchar *name) const {
+				return glGetUniformLocation(program, name);
+			}
 			operator GLuint(void) const {
 				return program;
 			}
@@ -70,19 +73,19 @@ namespace View {
 			Shader const& operator[](unsigned index) const {
 				return shaders[index];
 			}
-			bool attach(void) {
+			bool attach(void) const {
 				bool ret = true;
 				for(auto i = 0; i < N; i++)
 					ret &= program.attach(shaders[i]);
 				return ret;
 			}
-			bool link(void) {
+			bool link(void) const {
 				return program.link();
 			}
-			bool validate(void) {
+			bool validate(void) const {
 				return program.validate();
 			}
-			bool build(void) {
+			bool build(void) const {
 				return attach() && link() && validate();
 			}
 			// TODO format each info entry to make origin clear

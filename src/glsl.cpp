@@ -11,7 +11,7 @@ namespace Shaders {
 		return glGetProgramiv(id, k, dest), *dest;
 	}
 	Shader::operator GLuint(void) const { return id; }
-	Shader& Shader::source(std::string const& s) {
+	Shader const& Shader::source(std::string const& s) const {
 		if(!is_shader) return *this;
 		auto sc = s.c_str();
 		glShaderSource(id, 1, &sc, NULL);
