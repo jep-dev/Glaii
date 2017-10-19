@@ -14,30 +14,22 @@
 
 namespace Geometry {
 
-/*	template<typename>
-	struct ModelBase;
-
-	template<typename T>
-	struct ModelBase: Abstract::Updatable<T> {
-		using Abstract::Updatable<T>::update;
-	};*/
-
-	template<typename> struct xyzw;
-	template<typename> struct xyz;
+	template<typename> struct Quat_t;
+	template<typename> struct Vec_t;
 
 	template<typename X>
-	struct xyzw {
+	struct Quat_t {
 		X x, y, z, w;
 		template<typename R>
-		xyzw<X> operator=(xyzw<R> const& r) {
+		Quat_t<X> operator=(Quat_t<R> const& r) {
 			x = X(r.x); y = X(r.y);
 			z = X(r.z); w = X(r.w);
 			return *this;
 		}
-		xyzw<X> operator*(void) const {
+		Quat_t<X> operator*(void) const {
 			return {-x, -y, -z, w};
 		}
-		xyzw<X> operator-(void) const {
+		Quat_t<X> operator-(void) const {
 			return {-x, -y, -z, -w};
 		}
 		X operator[](unsigned char r) const {
@@ -55,30 +47,30 @@ namespace Geometry {
 		X magnitude(void) const {
 			return X(sqrt(magnitude2()));
 		}
-		xyzw<X> normalize(void) const {
+		Quat_t<X> normalize(void) const {
 			return *this / magnitude();
 		}
 		template<typename R, typename XR = COMBINE(X,+,R)>
-		xyzw<XR> operator+(xyzw<R> const& r) const {
+		Quat_t<XR> operator+(Quat_t<R> const& r) const {
 			return {XR(x+r.x), XR(y+r.y), XR(z+r.z), XR(w+r.w)};
 		}
 		template<typename R, typename XR = COMBINE(X,-,R)>
-		xyzw<XR> operator-(xyzw<R> const& r) const {
+		Quat_t<XR> operator-(Quat_t<R> const& r) const {
 			return {XR(x-r.x), XR(y-r.y), XR(z-r.z), XR(w-r.w)};
 		}
 		template<typename R>
-		bool operator==(xyzw<R> const& r) const {
+		bool operator==(Quat_t<R> const& r) const {
 			return x == r.x && y == r.y
 				&& z == r.z && w == r.w;
 		}
 		template<typename R, typename XR = COMBINE(X,/,R)>
-		xyzw<XR> operator/(R const& r) {
+		Quat_t<XR> operator/(R const& r) {
 			return {x/r, y/r, z/r, w/r};
 		}
 	};
 
 	template<typename X>
-	struct xyz {
+	struct Vec_t {
 		X x, y, z;
 		X operator[](unsigned char r) const {
 			switch(r) {
@@ -94,19 +86,19 @@ namespace Geometry {
 		X magnitude(void) const {
 			return X(sqrt(magnitude2()));
 		}
-		xyzw<X> normalize(void) const {
+		Quat_t<X> normalize(void) const {
 			return *this / magnitude();
 		}
 		template<typename R, typename XR = COMBINE(X,-,R)>
-		xyz<XR> operator-(xyz<R> const& r) const {
+		Vec_t<XR> operator-(Vec_t<R> const& r) const {
 			return {x-r.x, y-r.y, z-r.z};
 		}
 		template<typename R>
-		bool operator==(xyz<R> const& r) const {
+		bool operator==(Vec_t<R> const& r) const {
 			return x == r.x && y == r.y && z == r.z;
 		}
 		template<typename R, typename XR = COMBINE(X,/,R)>
-		xyz<XR> operator/(R const& r) {
+		Vec_t<XR> operator/(R const& r) {
 			return {x/r, y/r, z/r};
 		}
 	};
@@ -114,19 +106,19 @@ namespace Geometry {
 	template<typename R, typename S, typename T,
 		typename RS = COMBINE(R,-,S), typename ST = COMBINE(T,-,S),
 		typename RST = COMBINE(RS,*,ST)>
-	xyz<RST> cross(xyz<R> const& l, xyz<S> const& c, xyz<T> const& r) {
+	Vec_t<RST> cross(Vec_t<R> const& l, Vec_t<S> const& c, Vec_t<T> const& r) {
 		return (l-c)*(r-c);
 	}
 
 
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyzw<LR> rotate(L const& s, xyz<R> const& r) {
+	Quat_t<LR> rotate(L const& s, Vec_t<R> const& r) {
 		LR s2 = LR(s)/2, sc = LR(cos(s2)), ss = LR(sin(s2));
-		return xyzw<LR>{ss*r.x, ss*r.y, ss*r.z, sc};
+		return Quat_t<LR>{ss*r.x, ss*r.y, ss*r.z, sc};
 	}
 
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyzw<LR> operator*(xyzw<L> const& l, xyzw<R> const& r) {
+	Quat_t<LR> operator*(Quat_t<L> const& l, Quat_t<R> const& r) {
 		return {
 			LR(l.w * r.x + l.x * r.w + l.y * r.z - l.z * r.y),
 			LR(l.w * r.y - l.x * r.z + l.y * r.w + l.z * r.x),
@@ -135,8 +127,8 @@ namespace Geometry {
 		};
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyzw<LR> operator*(xyzw<L> const& l, xyz<R> const& r) {
-		return xyzw<LR> {
+	Quat_t<LR> operator*(Quat_t<L> const& l, Vec_t<R> const& r) {
+		return Quat_t<LR> {
 			LR(l.w * r.x             + l.y * r.z - l.z * r.y),
 			LR(l.w * r.y - l.x * r.z             + l.z * r.x),
 			LR(l.w * r.z + l.x * r.y - l.y * r.x            ),
@@ -144,25 +136,25 @@ namespace Geometry {
 		}**l;
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyzw<LR> operator*(xyzw<R> const& l, R const& r) {
+	Quat_t<LR> operator*(Quat_t<R> const& l, R const& r) {
 		return {LR(l.x*r), LR(l.y*r), LR(l.z*r), LR(l.w*r)};
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyzw<LR> operator*(L const& l, xyzw<R> const& r) {
+	Quat_t<LR> operator*(L const& l, Quat_t<R> const& r) {
 		return r*l;
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyz<LR> operator*(xyz<L> const& l, xyz<R> const& r) {
+	Vec_t<LR> operator*(Vec_t<L> const& l, Vec_t<R> const& r) {
 		return {LR(l.y * r.z - l.z * r.y),
 			LR(l.z * r.x - l.x * r.z),
 			LR(l.x * r.y - l.y * r.x)};
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyz<LR> operator*(xyz<R> const& l, L const& r) {
+	Vec_t<LR> operator*(Vec_t<R> const& l, L const& r) {
 		return {l.x*r, l.y*r, l.z*r};
 	}
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	xyz<LR> operator*(L const& l, xyz<R> const& r) {
+	Vec_t<LR> operator*(L const& l, Vec_t<R> const& r) {
 		return r * l;
 	}
 
@@ -176,7 +168,7 @@ namespace Geometry {
 		return near_zero((r-l).magnitude(), prox);
 	}
 	template<typename T>
-	std::ostream& operator<<(std::ostream& dest, xyzw<T> const& src) {
+	std::ostream& operator<<(std::ostream& dest, Quat_t<T> const& src) {
 		dest << std::showpos;
 		bool hit = false;
 		T x[] = {src.w, src.x, src.y, src.z};
@@ -195,8 +187,8 @@ namespace Geometry {
 		return dest;
 	}
 	template<typename T>
-	std::ostream& operator<<(std::ostream& dest, xyz<T> const& src) {
-		return dest << xyzw<T>{src.x, src.y, src.z, 0};
+	std::ostream& operator<<(std::ostream& dest, Vec_t<T> const& src) {
+		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
 	}
 }
 
