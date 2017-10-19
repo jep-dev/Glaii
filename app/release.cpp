@@ -49,7 +49,27 @@ bool run(std::ostream &dest, int n_frames) {
 		win << p;
 	else return dest << p.info(), false;
 
-		//bool test = update(win);
+	auto id_mvp = p.uniform("mvp");
+	if(id_mvp == -1)
+		return dest << "MVP uniform not found!", false;
+	float mvp[] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	}, vertices[] = {
+		// TODO
+	};
+	GLuint vbo = 0, vao = 0;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof mvp, mvp, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vbo);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vao);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+
 	unsigned frame = 0;
 	while(win) {
 		//bool test = update(win, frame);
