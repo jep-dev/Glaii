@@ -61,15 +61,15 @@ namespace View {
 					errors.push_back("Errors precede Window creation.");
 					break;
 				}
+				int i = 0;
+				for(auto const& attr : {attribs...})
+					SDL_GL_SetAttribute(attr.first, attr.second);
 				win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL);
 				if(errors() || !win) {
 					errors.push_back("SDL window could not be created.");
 					break;
 				}
-				int i = 0;
-				for(auto const& attr : {attribs...})
-					SDL_GL_SetAttribute(attr.first, attr.second);
 				ctx = SDL_GL_CreateContext(win);
 				if(!ctx) {
 					errors.push_back("SDL context could not be created.");
@@ -81,7 +81,7 @@ namespace View {
 					i++;
 					SDL_GLattr k = attr.first;
 					// SDL_GLattr const& k = std::get<0>(attr);
-					int v0 = attr.first, v1 = v0;
+					int v0 = attr.second, v1 = v0;
 					//int v0 = std::get<1>(attr), v1 = v0;
 					SDL_GL_GetAttribute(k, &v1);
 					if(errors() || (v0 != v1)) {
