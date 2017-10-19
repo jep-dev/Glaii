@@ -25,8 +25,7 @@ namespace View {
 		return dest << "Window: " << src.errors;
 	}
 	bool Window::validate(void) {
-		return !errors() && *this;
-		// return live &= !errors();
+		return live && (live &= !errors());
 	}
 	bool Window::handle(SDL_WindowEvent const& ev) {
 		switch(ev.type) {
