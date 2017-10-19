@@ -17,14 +17,13 @@ namespace View {
 
 namespace View {
 
-	using Attrib = std::tuple<const SDL_GLattr, const int, int>;
+	using Attrib = std::pair<const SDL_GLattr, const int>;
 	Attrib attrib(SDL_GLattr k, int v) {
-		return std::make_tuple(k, v, v);
+		return std::make_pair(k,v);
 	}
 
 	/** @brief RAII and operations for SDL-authored window/context pair. */
 	struct Window: Abstract::Updatable<Window> {
-	// Abstract::Handler<SDL_WindowEvent, SDL_KeyboardEvent, SDL_{
 	protected:
 		SDL_Window *win;
 		Streams::ErrorFIFO errors;
@@ -42,17 +41,9 @@ namespace View {
 		template<GLenum E0, GLenum... EN>
 		Window& operator<<(Shaders::Program<E0,EN...>& prog) {
 			if(prog.build()) glUseProgram(prog);
-			else errors << "Error while building shader(s)" << prog;
+			else errors << "Error while building shader(s) " << prog;
 			errors();
 			return *this;
-			/*using namespace Shaders;
-			Shader const& prog = p.program;
-			if(prog.is_program
-				&& !prog(GL_DELETE_STATUS, int(GL_TRUE))
-				&& (prog(GL_ATTACHED_SHADERS) > 0)
-				&& prog(GL_LINK_STATUS, int(GL_TRUE))) {
-				glUseProgram(prog);
-			}*/
 		}
 		bool validate(void);
 
@@ -77,8 +68,8 @@ namespace View {
 					break;
 				}
 				int i = 0;
-				for(auto attr : {attribs...})
-					SDL_GL_SetAttribute(std::get<0>(attr), std::get<2>(attr));
+				for(auto const& attr : {attribs...})
+					SDL_GL_SetAttribute(attr.first, attr.second);
 				ctx = SDL_GL_CreateContext(win);
 				if(!ctx) {
 					errors.push_back("SDL context could not be created.");
@@ -86,11 +77,12 @@ namespace View {
 				}
 				SDL_GL_MakeCurrent(win, ctx);
 				Binding::initialize(false);
-				for(auto attr : {attribs...}) {
+				for(auto& attr : {attribs...}) {
 					i++;
-					SDL_GLattr const& k = std::get<0>(attr);
-					int const& v0 = std::get<1>(attr);
-					int& v1 = std::get<2>(attr);
+					SDL_GLattr k = attr.first;
+					// SDL_GLattr const& k = std::get<0>(attr);
+					int v0 = attr.first, v1 = v0;
+					//int v0 = std::get<1>(attr), v1 = v0;
 					SDL_GL_GetAttribute(k, &v1);
 					if(errors() || (v0 != v1)) {
 						std::ostringstream oss;
