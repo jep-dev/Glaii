@@ -28,20 +28,14 @@
 bool run(std::ostream &dest, int n_frames) {
 	using namespace View;
 	using namespace Shaders;
-	static constexpr auto
-		iv_cmp = GL_COMPILE_STATUS, iv_link = GL_LINK_STATUS,
-		iv_del = GL_DELETE_STATUS,  iv_log = GL_INFO_LOG_LENGTH;
-	static constexpr auto ctr = SDL_GetPerformanceCounter,
-		freq = SDL_GetPerformanceFrequency;
 
-	Window win("Title", 640, 480, SDL_WINDOW_RESIZABLE,
-		attrib(CTX(PROFILE_MASK), CTX(PROFILE_CORE)),
-		attrib(CTX(MAJOR_VERSION), 3), attrib(CTX(MINOR_VERSION), 3),
-		attrib(SDL_GL_DOUBLEBUFFER, 1));
-	if(!win) {
-		dest << win;
-		return false;
-	}
+	unsigned w = 640, h = 480;
+	auto asp = float(w)/h; // TODO test aspect easing from view.hpp
+	Window win("Title", w, h, SDL_WINDOW_RESIZABLE,
+			{{CTX(PROFILE_MASK), CTX(PROFILE_CORE)},
+			{CTX(MAJOR_VERSION), 3}, {CTX(MINOR_VERSION), 3},
+			{SDL_GL_DOUBLEBUFFER, 1}});
+	if(!win) return dest << win, false;
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
 	if(p[0].source(Source(GLSL_VERT)).compile()
@@ -52,36 +46,56 @@ bool run(std::ostream &dest, int n_frames) {
 	auto id_mvp = p.uniform("mvp");
 	if(id_mvp == -1)
 		return dest << "MVP uniform not found!", false;
-	float mvp[] = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	}, vertices[] = {
-		// TODO
-	};
+
+	float x0 = -asp, y0 = 1, z0 = -1,
+		  x1 = asp, y1 = 10, z1 = 1,
+		m00 = z0/x0, m11 = z0/z1, m2_ = z0-z1,
+		m22 = (z0+z1)/m2_, m23 = 2*z0*z0/m2_,
+		mvp[] = {
+			m00,   0,   0,   0,
+			  0, m11,   0,   0,
+			  0,   0, m22, m23,
+			  0,   0,  -1,   0
+		}, vertices[] = {
+			-1,  +5,  -1,  +1,
+			+1,  +5,  -1,  +1,
+			+1,  +5,  +1,  +1,
+			-1,  +5,  +1,  +1
+		};
+	unsigned indices[] = {0, 1, 2, 0, 2, 3};
+
 	GLuint vbo = 0, vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof mvp, mvp, GL_STATIC_DRAW);
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof vertices,
+		vertices, GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vao);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	unsigned frame = 0;
+	unsigned long total = 0;
+	auto t0 = SDL_GetPerformanceCounter();
 	while(win) {
-		//bool test = update(win, frame);
-		//return test;
-		auto pre = (*ctr)();
 		if(!win.draw(frame)) break;
-		auto post = (*ctr)();
-		auto tps = (*freq)();
-		auto dt = post - pre;
+		auto t1 = SDL_GetPerformanceCounter(),
+			dt = t1 - t0;
+		t0 = t1;
+		total += dt;
+
+		/* Theoretical divide by zero later if timer resolution is not
+		 * high enough to register a difference between frames
+		 * Realistically the calls to the high-resolution timer alone
+		 * should take a few milliseconds -- TODO research? */
 		if(dt <= 0) continue;
-		auto fps = tps / float(dt);
-		flush(dest << "\rFPS[" << frame << "] = " << fps);
+		auto fps = float(SDL_GetPerformanceFrequency()) / dt,
+			fpsRatio = total * 100.0f / (dt * frame);
+		flush(dest << "\rFrame " << frame << ": FPS = "
+			<< std::setw(4) << fps
+			<< " (" << fpsRatio << "% of average)");
 		frame++;
 	}
 	dest << '\n' << win;
