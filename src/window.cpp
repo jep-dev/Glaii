@@ -61,5 +61,50 @@ namespace View {
 		return validate();
 	}
 
+Window::Window(const char *title, int w, int h,
+		Uint32 flags, std::map<SDL_GLattr, int> const& attribs) {
+		do {
+			if(errors()) {
+				errors.emplace_back("Window creation disabled.");
+				break;
+			}
+			int i = 0;
+			//for(auto const& attr : {attribs...})
+			for(auto const& attr : attribs)
+				SDL_GL_SetAttribute(attr.first, attr.second);
+			win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+				SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL);
+			if(errors() || !win) {
+				errors.push_back("SDL window could not be created.");
+				break;
+			}
+			ctx = SDL_GL_CreateContext(win);
+			if(!ctx) {
+				errors.push_back("SDL context could not be created.");
+				break;
+			}
+			SDL_GL_MakeCurrent(win, ctx);
+			Binding::initialize(false);
+			for(auto const& attr : attribs) {
+				i++;
+				SDL_GLattr k = attr.first;
+				// SDL_GLattr const& k = std::get<0>(attr);
+				int v0 = attr.second, v1 = v0;
+				//int v0 = std::get<1>(attr), v1 = v0;
+				SDL_GL_GetAttribute(k, &v1);
+				if(errors() || (v0 != v1)) {
+					std::ostringstream oss;
+					oss << "Attribute #" << i << ": ["
+						<< k << "] = " << v1 << " != " << v0;
+					errors.push_back(oss.str());
+					break;
+				}
+			}
+			live = true;
+			SDL_GL_SetSwapInterval(1);
+			return;
+		} while(0);
+		live = false;
+	}
 
 }

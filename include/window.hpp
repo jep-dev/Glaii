@@ -55,6 +55,8 @@ namespace View {
 		bool draw(unsigned frame);
 
 		Window(const char *title, int w, int h,
+			Uint32 flags, std::map<SDL_GLattr, int> const& attribs);
+		/*Window(const char *title, int w, int h,
 			Uint32 flags, std::map<SDL_GLattr, int> const& attribs) {
 			do {
 				if(errors()) {
@@ -86,11 +88,6 @@ namespace View {
 					//int v0 = std::get<1>(attr), v1 = v0;
 					SDL_GL_GetAttribute(k, &v1);
 					if(errors() || (v0 != v1)) {
-						/*std::ostringstream oss;
-						oss << "Attribute #" << i << "/"
-							<< sizeof...(S) << ": [" << k << "] = "
-							<< v1 << " != " << v0;
-						errors.push_back(oss.str());*/
 						std::ostringstream oss;
 						oss << "Attribute #" << i << ": ["
 							<< k << "] = " << v1 << " != " << v0;
@@ -99,10 +96,11 @@ namespace View {
 					}
 				}
 				live = true;
+				SDL_GL_SetSwapInterval(1);
 				return;
 			} while(0);
 			live = false;
-		}
+		}*/
 	};
 }
 
