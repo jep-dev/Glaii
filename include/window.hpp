@@ -53,16 +53,17 @@ namespace View {
 
 		bool update(unsigned frame);
 		bool draw(unsigned frame);
-		template<typename... S>
+
 		Window(const char *title, int w, int h,
-				Uint32 flags, S &&... attribs) {
+			Uint32 flags, std::map<SDL_GLattr, int> const& attribs) {
 			do {
 				if(errors()) {
-					errors.push_back("Errors precede Window creation.");
+					errors.emplace_back("Window creation disabled.");
 					break;
 				}
 				int i = 0;
-				for(auto const& attr : {attribs...})
+				//for(auto const& attr : {attribs...})
+				for(auto const& attr : attribs)
 					SDL_GL_SetAttribute(attr.first, attr.second);
 				win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL);
@@ -77,7 +78,7 @@ namespace View {
 				}
 				SDL_GL_MakeCurrent(win, ctx);
 				Binding::initialize(false);
-				for(auto& attr : {attribs...}) {
+				for(auto const& attr : attribs) {
 					i++;
 					SDL_GLattr k = attr.first;
 					// SDL_GLattr const& k = std::get<0>(attr);
@@ -85,10 +86,14 @@ namespace View {
 					//int v0 = std::get<1>(attr), v1 = v0;
 					SDL_GL_GetAttribute(k, &v1);
 					if(errors() || (v0 != v1)) {
-						std::ostringstream oss;
+						/*std::ostringstream oss;
 						oss << "Attribute #" << i << "/"
 							<< sizeof...(S) << ": [" << k << "] = "
 							<< v1 << " != " << v0;
+						errors.push_back(oss.str());*/
+						std::ostringstream oss;
+						oss << "Attribute #" << i << ": ["
+							<< k << "] = " << v1 << " != " << v0;
 						errors.push_back(oss.str());
 						break;
 					}
