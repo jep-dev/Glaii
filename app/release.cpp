@@ -34,7 +34,7 @@ bool run(std::ostream &dest, int n_frames) {
 	Window win("Title", w, h, SDL_WINDOW_RESIZABLE,
 			{{CTX(PROFILE_MASK), CTX(PROFILE_CORE)},
 			{CTX(MAJOR_VERSION), 3}, {CTX(MINOR_VERSION), 3},
-			{SDL_GL_DOUBLEBUFFER, 1}});
+			{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}});
 	if(!win) return dest << win, false;
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
@@ -52,10 +52,10 @@ bool run(std::ostream &dest, int n_frames) {
 		m00 = z0/x0, m11 = z0/z1, m2_ = z0-z1,
 		m22 = (z0+z1)/m2_, m23 = 2*z0*z0/m2_,
 		mvp[] = {
-			m00,   0,   0,   0,
-			  0, m11,   0,   0,
-			  0,   0, m22, m23,
-			  0,   0,  -1,   0
+			m00,  0,   0,   0,
+			 0,  m11,  0,   0,
+			 0,   0,  m22, m23,
+			 0,   0,  -1,   0
 		}, vertices[] = {
 			-1,  +5,  -1,  +1,
 			+1,  +5,  -1,  +1,
