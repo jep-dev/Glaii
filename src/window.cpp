@@ -55,7 +55,7 @@ namespace View {
 		return validate();
 	}
 	bool Window::draw(unsigned frame) {
-		static constexpr unsigned freq60 = 100/6;
+		static constexpr unsigned freq60 = 100/6+1;
 		if(!update(frame)) return false;
 		SDL_GL_SwapWindow(win);
 		SDL_Delay(freq60);
