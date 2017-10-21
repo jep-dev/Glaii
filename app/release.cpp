@@ -76,27 +76,27 @@ bool run(std::ostream &dest, int n_frames) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	unsigned frame = 0;
-	unsigned long total = 0;
-	auto t0 = SDL_GetPerformanceCounter();
+	unsigned long sumDt = 0;
+	unsigned frame = 0, frameField = 6, fpsField = 7, diffField = 8;
+	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
+	endl(dest << std::left << std::setw(frameField) << "Frame" << ' '
+		<< std::setw(fpsField) << "FPS" << " FPS/avg-1");
 	while(win) {
 		if(!win.draw(frame)) break;
 		auto t1 = SDL_GetPerformanceCounter(),
 			dt = t1 - t0;
 		t0 = t1;
-		total += dt;
-
-		/* Theoretical divide by zero later if timer resolution is not
-		 * high enough to register a difference between frames
-		 * Realistically the calls to the high-resolution timer alone
-		 * should take a few milliseconds -- TODO research? */
-		if(dt <= 0) continue;
-		auto fps = float(SDL_GetPerformanceFrequency()) / dt,
-			fpsRatio = total * 100.0f / (dt * frame);
-		flush(dest << "\rFrame " << frame << ": FPS = "
-			<< std::setw(4) << fps
-			<< " (" << fpsRatio << "% of average)");
+		sumDt += dt;
 		frame++;
+		if((frame & 7) != 0) continue;
+		auto curFps = float(SDL_GetPerformanceFrequency())/dt,
+			 diffFps = 100*(float(sumDt)/frame/dt - 1);
+		flush(dest << '\r' << std::left
+			<< std::setw(frameField) << frame << ' '
+			<< std::setw(fpsField) << int(curFps*1000)/1000.f << ' '
+			<< std::setw(diffField) << std::showpos
+			<< int(diffFps*1000)/1000.f << std::noshowpos << std::right);
+		if((frame & 255) == 0) endl(dest);
 	}
 	dest << '\n' << win;
 	return win.validate();
