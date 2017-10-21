@@ -49,8 +49,9 @@ bool run(std::ostream &dest, int n_frames) {
 
 	float x0 = -asp, y0 = 1, z0 = -1,
 		  x1 = asp, y1 = 10, z1 = 1,
-		m00 = z0/x0, m11 = z0/z1, m2_ = z0-z1,
-		m22 = (z0+z1)/m2_, m23 = 2*z0*z0/m2_,
+		// Using y as near/far axis
+		m00 = y0/x0, m11 = y0/y1, m2_ = y0-y1,
+		m22 = (y0+y1)/m2_, m23 = 2*y0*y0/m2_,
 		mvp[] = {
 			m00,  0,   0,   0,
 			 0,  m11,  0,   0,
@@ -76,27 +77,23 @@ bool run(std::ostream &dest, int n_frames) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	unsigned long sumDt = 0;
-	unsigned frame = 0, frameField = 6, fpsField = 7, diffField = 8;
+	unsigned frame = 0;
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
-	endl(dest << std::left << std::setw(frameField) << "Frame" << ' '
-		<< std::setw(fpsField) << "FPS" << " FPS/avg-1");
+	endl(dest << "Frame" << std::right
+		<< std::setw(9) << std::setfill('.') << "FPS");
 	while(win) {
 		if(!win.draw(frame)) break;
-		auto t1 = SDL_GetPerformanceCounter(),
-			dt = t1 - t0;
-		t0 = t1;
-		sumDt += dt;
+		auto t1 = SDL_GetPerformanceCounter();
 		frame++;
-		if((frame & 7) != 0) continue;
-		auto curFps = float(SDL_GetPerformanceFrequency())/dt,
-			 diffFps = 100*(float(sumDt)/frame/dt - 1);
-		flush(dest << '\r' << std::left
-			<< std::setw(frameField) << frame << ' '
-			<< std::setw(fpsField) << int(curFps*1000)/1000.f << ' '
-			<< std::setw(diffField) << std::showpos
-			<< int(diffFps*1000)/1000.f << std::noshowpos << std::right);
-		if((frame & 255) == 0) endl(dest);
+		if(!(frame & 15)) {
+			auto freq = SDL_GetPerformanceFrequency();
+			auto fps = float(freq)/(t1-t0);
+			flush(dest << '\r'
+				<< std::setw(5) << std::setfill('.') << std::left << frame
+				<< std::setw(9) << std::right << fps << std::setfill(' '));
+			if((frame & 255) == 0) dest << '\n';
+		}
+		t0 = t1;
 	}
 	dest << '\n' << win;
 	return win.validate();
