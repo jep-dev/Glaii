@@ -16,7 +16,7 @@ namespace View {
 
 namespace View {
 
-	/** @brief RAII and operations for SDL-authored window/context pair. */
+	/** @brief RAII and operations on an SDL window/context pair. */
 	struct Window: Abstract::Updatable<Window> {
 	protected:
 		SDL_Window *win;
