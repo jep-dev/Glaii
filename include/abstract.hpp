@@ -4,9 +4,7 @@
 #include <functional>
 #include <type_traits>
 #include <typeinfo>
-// #include <iosfwd>
 #include <ostream>
-#include <utility>
 
 // Deduce type from expression, generally for template arg defaults
 // TODO more generalized deductions than just infix operators?
