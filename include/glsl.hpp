@@ -1,16 +1,11 @@
 #ifndef GLSL_HPP
 #define GLSL_HPP
 #include <SDL2/SDL_video.h>
-#include "view.hpp"
-#include <iostream>
-#include <vector>
-#include <map>
 
 namespace View {
 	using namespace Abstract;
 
 	namespace Shaders {
-		using std::ostream;
 
 		/** @brief RAII shader program with at least one member
 		 * @tparam E0 Type of the first shader member
@@ -50,7 +45,7 @@ namespace View {
 			bool attach(GLuint s) const;
 			bool link(void) const;
 			bool validate(void) const;
-			string info(void) const;
+			std::string info(void) const;
 			Shader(void);
 			Shader(GLenum E);
 			Shader(GLuint id);
@@ -94,8 +89,8 @@ namespace View {
 				glUseProgram(program);
 				return true;
 			}
-			string info(void) const {
-				string out;
+			std::string info(void) const {
+				std::string out;
 				for(unsigned i = 0; i < N; i++)
 					out += shaders[i].info();
 				return out + program.info();

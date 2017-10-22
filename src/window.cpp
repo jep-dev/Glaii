@@ -1,4 +1,4 @@
-#include "window.hpp"
+#include "view.hpp"
 
 #include <SDL2/SDL.h>
 

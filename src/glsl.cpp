@@ -1,4 +1,4 @@
-#include "glsl.hpp"
+#include "view.hpp"
 
 namespace View {
 namespace Shaders {

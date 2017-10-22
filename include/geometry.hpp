@@ -3,9 +3,6 @@
 
 #include "abstract.hpp"
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 #include <math.h>
 
 #ifndef INTOLERANCE
@@ -64,7 +61,7 @@ namespace Geometry {
 				&& z == r.z && w == r.w;
 		}
 		template<typename R, typename XR = COMBINE(X,/,R)>
-		Quat_t<XR> operator/(R const& r) {
+		Quat_t<XR> operator/(R const& r) const {
 			return {x/r, y/r, z/r, w/r};
 		}
 	};
@@ -86,7 +83,7 @@ namespace Geometry {
 		X magnitude(void) const {
 			return X(sqrt(magnitude2()));
 		}
-		Quat_t<X> normalize(void) const {
+		Vec_t<X> normalize(void) const {
 			return *this / magnitude();
 		}
 		template<typename R, typename XR = COMBINE(X,-,R)>
@@ -98,7 +95,7 @@ namespace Geometry {
 			return x == r.x && y == r.y && z == r.z;
 		}
 		template<typename R, typename XR = COMBINE(X,/,R)>
-		Vec_t<XR> operator/(R const& r) {
+		Vec_t<XR> operator/(R const& r) const {
 			return {x/r, y/r, z/r};
 		}
 	};
@@ -167,9 +164,8 @@ namespace Geometry {
 	bool near(L const& l, R const& r, unsigned prox = INTOLERANCE) {
 		return near_zero((r-l).magnitude(), prox);
 	}
-	template<typename T>
-	std::ostream& operator<<(std::ostream& dest, Quat_t<T> const& src) {
-		dest << std::showpos;
+	template<typename S, typename T>
+	S& operator<<(S& dest, Quat_t<T> const& src) {
 		bool hit = false;
 		T x[] = {src.w, src.x, src.y, src.z};
 		const char *l[] = {"", "i", "j", "k"};
@@ -183,13 +179,18 @@ namespace Geometry {
 				dest << ((ix < 0) ? "-" : "+") << il;
 			else dest << ix << il;
 		}
-		if(!hit) dest << '0';
+		if(!hit) dest << "0";
 		return dest;
 	}
-	template<typename T>
-	std::ostream& operator<<(std::ostream& dest, Vec_t<T> const& src) {
+	template<typename S, typename T>
+	S& operator<<(S& dest, Vec_t<T> const& src) {
 		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
 	}
+
+	template struct Quat_t<float>;
+	template struct Vec_t<float>;
+	template struct Quat_t<double>;
+	template struct Vec_t<double>;
 }
 
 #endif

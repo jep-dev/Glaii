@@ -1,8 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include "view.hpp"
-// #include "glsl.hpp"
+#include <map>
 #include <glbinding/Binding.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_timer.h>

@@ -6,7 +6,8 @@
 #include <SDL2/SDL_video.h>
 
 #include "abstract.hpp"
-#include "streams.hpp"
+#include <sstream>
+#include <string>
 
 namespace Streams {
 	/** @brief Deque of non-empty strings interpreted as errors. */
@@ -43,7 +44,6 @@ namespace Streams {
 }
 
 namespace View {
-	using namespace Streams;
 	using namespace gl;
 
 	template<typename T>
@@ -59,5 +59,8 @@ namespace View {
 		return tan(fovEase(dest, src, aspect, ease)/2);
 	}
 }
+
+#include "glsl.hpp"
+#include "window.hpp"
 
 #endif
