@@ -81,9 +81,8 @@ namespace Abstract {
 	};
 
 	template<typename S>
-	unsigned get_id(S const& s) {
-		return S::get_id(s);
-	}
+	unsigned get_id(S const& s);
+		//return S::get_id(s);
 	template<typename S> std::ostream&
 		operator<<(std::ostream &os, tag_id<S> const& t);
 	template<typename S> std::ostream&
