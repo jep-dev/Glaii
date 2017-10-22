@@ -55,10 +55,10 @@ namespace View {
 		return validate();
 	}
 	bool Window::draw(unsigned frame) {
-		static constexpr unsigned freq60 = 100/6+1;
+		static constexpr unsigned mspf60 = 100/6+1;
 		if(!update(frame)) return false;
 		SDL_GL_SwapWindow(win);
-		SDL_Delay(freq60);
+		SDL_Delay(mspf60);
 		return validate();
 	}
 
@@ -73,7 +73,8 @@ namespace View {
 			for(auto const& attr : attribs)
 				SDL_GL_SetAttribute(attr.first, attr.second);
 			win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
-				SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL);
+				SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL
+				| SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 			if(errors() || !win) {
 				errors.emplace_back("SDL window could not be created.");
 				break;

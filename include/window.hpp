@@ -2,7 +2,7 @@
 #define WINDOW_HPP
 
 #include "view.hpp"
-#include "glsl.hpp"
+// #include "glsl.hpp"
 #include <glbinding/Binding.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_timer.h>
@@ -16,11 +16,6 @@ namespace View {
 #include "runnable.hpp"
 
 namespace View {
-
-	using Attrib = std::pair<const SDL_GLattr, const int>;
-	Attrib attrib(SDL_GLattr k, int v) {
-		return std::make_pair(k,v);
-	}
 
 	/** @brief RAII and operations for SDL-authored window/context pair. */
 	struct Window: Abstract::Updatable<Window> {
@@ -38,13 +33,6 @@ namespace View {
 
 		friend std::ostream&
 		operator<<(std::ostream &dest, Window const& src);
-		template<GLenum E0, GLenum... EN>
-		Window& operator<<(Shaders::Program<E0,EN...>& prog) {
-			if(prog.build()) glUseProgram(prog);
-			else errors << "Error while building shader(s) " << prog;
-			errors();
-			return *this;
-		}
 		bool validate(void);
 
 		bool handle(SDL_WindowEvent const& ev);

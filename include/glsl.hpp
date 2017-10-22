@@ -88,7 +88,12 @@ namespace View {
 			bool build(void) const {
 				return attach() && link() && validate();
 			}
-			// TODO format each info entry to make origin clear
+			bool use(void) const {
+				if(GL_TRUE != programiv(program, GL_LINK_STATUS))
+					return false;
+				glUseProgram(program);
+				return true;
+			}
 			string info(void) const {
 				string out;
 				for(unsigned i = 0; i < N; i++)
