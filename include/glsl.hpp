@@ -1,5 +1,6 @@
 #ifndef GLSL_HPP
 #define GLSL_HPP
+
 #include <SDL2/SDL_video.h>
 
 namespace View {
@@ -31,7 +32,7 @@ namespace View {
 		int programiv(GLuint id, GLenum k, int src = -1, int *dest = 0);
 
 		/** @brief RAII shader alloc/source/compile/dealloc */
-		struct Shader {
+		struct Shader: tag_id<Shader> {
 		protected:
 			const GLuint id;
 		public:
@@ -51,6 +52,9 @@ namespace View {
 			Shader(GLuint id);
 			virtual ~Shader(void);
 		};
+		/** @brief RAII collection of shader sources as a shader program.
+		 * @tparam E0 Type of the first shader (there must be at least one)
+		 * @tparam EN Type of remaining shaders */
 		template<GLenum E0, GLenum... EN>
 		struct Program {
 			static constexpr auto N = sizeof...(EN)+1;
