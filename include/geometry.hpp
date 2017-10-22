@@ -14,6 +14,10 @@ namespace Geometry {
 	template<typename> struct Quat_t;
 	template<typename> struct Vec_t;
 
+	/**
+	 * @brief Quaternion template with format i, j, k, real.
+	 * @tparam X The domain of each member.
+	 */
 	template<typename X>
 	struct Quat_t {
 		X x, y, z, w;
@@ -66,6 +70,10 @@ namespace Geometry {
 		}
 	};
 
+	/**
+	 * @brief A 3D vector template, analogous to pure-imaginary quaternions.
+	 * @tparam X The domain of each of the members.
+	 */
 	template<typename X>
 	struct Vec_t {
 		X x, y, z;
@@ -100,18 +108,38 @@ namespace Geometry {
 		}
 	};
 
+	/**
+ 	 * @brief The cross product of two (un-normalized) vector differences.
+	 * @tparam R The domain of the first vector
+	 * @tparam S The domain of the second vector, the shared origin
+	 * @tparam T The domain of the third vector
+	 * @tparam RS The range of the first vector difference
+	 * @tparam ST The range of the second vector difference
+	 * @tparam RST The range of the final cross product
+	 * @return The resulting cross product
+	 */
 	template<typename R, typename S, typename T,
 		typename RS = COMBINE(R,-,S), typename ST = COMBINE(T,-,S),
 		typename RST = COMBINE(RS,*,ST)>
-	Vec_t<RST> cross(Vec_t<R> const& l, Vec_t<S> const& c, Vec_t<T> const& r) {
+	Vec_t<RST> cross(Vec_t<R> const& l,
+			Vec_t<S> const& c, Vec_t<T> const& r) {
 		return (l-c)*(r-c);
 	}
 
 
+	/**
+	 * @brief Angle-axis rotation to equivalent quaternion
+	 * @tparam L The domain of the rotation magnitude
+	 * @tparam R The domain of the rotation axis
+	 * @param l The rotation angle in radians
+	 * @param r The rotation axis, generally normalized
+	 * @tparam LR The range of the resulting quaternion
+	 * @return The quaternion representation of the rotation
+	 */
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	Quat_t<LR> rotate(L const& s, Vec_t<R> const& r) {
-		LR s2 = LR(s)/2, sc = LR(cos(s2)), ss = LR(sin(s2));
-		return Quat_t<LR>{ss*r.x, ss*r.y, ss*r.z, sc};
+	Quat_t<LR> rotate(L const& l, Vec_t<R> const& r) {
+		LR l2 = LR(l)/2, lc = LR(cos(l2)), ls = LR(sin(l2));
+		return Quat_t<LR>{ls*r.x, ls*r.y, ls*r.z, lc};
 	}
 
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
@@ -155,11 +183,29 @@ namespace Geometry {
 		return r * l;
 	}
 
+	/**
+	 * @brief Fuzzy comparison to zero (avoids division due to aliasing)
+	 * @tparam L The domain of the value to compare
+	 * @param l The subject to compare to the range endpoints
+	 * @param prox The proximity factor, or inverse tolerance
+	 * @return True if and only if the value is within [-1,1] after
+	 * multiplication with the given or default proximity/'intolerance'
+	 */
 	template<typename L>
 	bool near_zero(L const& l, unsigned prox = INTOLERANCE) {
 		auto lp = l * prox;
 		return lp >= -1 && lp <= 1;
 	}
+	/**
+	 * @brief Fuzzy comparison of multidimensional values
+	 * @tparam L Type of the subject with magnitude method
+	 * @tparam R Type of the object with magnitude method
+	 * @param l The subject or subtrahend of the comparison
+	 * @param r The object or minuend of the comparison
+	 * @param prox The proximity factor, or inverse tolerance
+	 * @return True if and only if the magnitude of the difference of
+	 * inputs is near zero
+	 */
 	template<typename L, typename R>
 	bool near(L const& l, R const& r, unsigned prox = INTOLERANCE) {
 		return near_zero((r-l).magnitude(), prox);
