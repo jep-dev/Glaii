@@ -1,14 +1,8 @@
 #ifndef STREAMS_HPP
 #define STREAMS_HPP
 
-#include <algorithm>
-#include <iosfwd>
 #include <fstream>
 #include <sstream>
-#include <iosfwd>
-#include <fstream>
-#include <numeric>
-#include <map>
 #include <vector>
 
 namespace Streams {
@@ -36,7 +30,6 @@ namespace Streams {
 		std::string buf, srcStr = src;
 		std::vector<std::string> lines;
 		std::stringstream ss(srcStr);
-		//while(getline(ss, buf, delim)) {
 		do {
 			bool done = !getline(ss, buf, delim);
 			unsigned buf_len = buf.size(),
