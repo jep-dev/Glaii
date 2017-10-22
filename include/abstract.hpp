@@ -3,7 +3,10 @@
 
 #include <functional>
 #include <type_traits>
-#include <iosfwd>
+#include <typeinfo>
+// #include <iosfwd>
+#include <ostream>
+#include <utility>
 
 // Deduce type from expression, generally for template arg defaults
 // TODO more generalized deductions than just infix operators?
@@ -21,7 +24,7 @@ namespace Abstract {
 	/** @brief Helper type using CRTP for compile-time polymorphism. */
 	template<typename> struct derived;
 	/** @brief Helper type giving a per-type UID to instances. */
-	template<typename T, typename = T> struct tag_id;
+	template<typename T> struct tag_id;
 	/** @brief General-purpose type label/tag. */
 	template<typename = null_type> struct tag_type {};
 	/** @brief Alias for integral constant to match tag_ pattern */
@@ -65,7 +68,7 @@ namespace Abstract {
 	template<typename S, typename... T>
 	struct intf_require: decltype(implements<S,T...>(0)) {};
 
-	template<typename T, typename D>
+	template<typename D>
 	struct tag_id: derived<D> {
 	private:
 		static unsigned next_id(void) {
@@ -75,18 +78,12 @@ namespace Abstract {
 		const unsigned id = next_id();
 	public:
 		unsigned get_id(void) const { return id; }
-		static unsigned get_id(tag_id<T> const& t) {
-			return t.get_id();
-		}
 	};
 
-	template<typename S>
-	unsigned get_id(S const& s);
-		//return S::get_id(s);
-	template<typename S> std::ostream&
-		operator<<(std::ostream &os, tag_id<S> const& t);
-	template<typename S> std::ostream&
-		operator<<(std::ostream &os, derived<S> const& t);
+	template<typename D>
+	std::ostream& operator<<(std::ostream& dest, tag_id<D> const& d) {
+		return dest << '#' << d.get_id();
+	}
 }
 
 #endif
