@@ -25,6 +25,13 @@ namespace Streams {
 		template<typename S> Source(S s);
 	};
 
+	/**
+	 * @brief Splits lines and pads them to a multiple of the given width.
+	 * @param src The source string to split
+	 * @param srcWidth The width used to calculate and append padding
+	 * @param delim The character used to identify line boundaries
+	 * @return The separated lines as a vector, each padded as described
+	 */
 	std::vector<std::string>
 	split(std::string const& src, unsigned srcWidth, char delim = '\n') {
 		std::string buf, srcStr = src;
@@ -40,6 +47,16 @@ namespace Streams {
 		} while(1);
 		return lines;
 	}
+	/**
+	 * @brief Columnates input; emulates GNU paste with aligned newlines
+	 * @param dest The destination of the pasted columns
+	 * @param lhs The contents of the left column
+	 * @param lWidth The width used to wrap lines in the left column
+	 * @param rhs The contents of the right column
+	 * @param rWidth The width used to wrap lines in the right column
+	 * @param sepWidth The width of the separation between columns
+	 * @param delim The character used to identify line boundaries
+	 */
 	std::ostream& paste(std::ostream& dest,
 			std::string const& lhs, unsigned lWidth,
 			std::string const& rhs, unsigned rWidth,
@@ -81,8 +98,20 @@ namespace Streams {
 		}
 		return dest;
 	}
-	std::ostream&
-	pasteBorder(std::ostream& dest,
+	/**
+	 * @brief Columnates input with aligned newlines and outer border
+	 * @param dest The destination of the pasted columns
+	 * @param lhs The contents of the left column
+	 * @param lWidth The width used to wrap lines in the left column
+	 * @param rhs The contents of the right column
+	 * @param rWidth The width used to wrap lines in the right column
+	 * @param sepWidth The width of the separation between columns
+	 * @param bordWidth The width of the left and right outer borders
+	 * @param north Enables horizontal rule prepended to output
+	 * @param south Enables horizontal rule appended to output
+	 * @param delim The character used to identify line boundaries
+	 */
+	std::ostream& pasteBorder(std::ostream& dest,
 			std::string const& lhs, unsigned lWidth,
 			std::string const& rhs, unsigned rWidth,
 			unsigned sepWidth = 3, unsigned bordWidth = 1,
