@@ -84,5 +84,4 @@ int main(int argc, const char *argv[]) {
 			cout << "    p = " << p << " --> qpq* = " << q*p << endl;
 		}
 	}
-	endl(cout << "Do integer versions work? " << Quat_t<int>{1, 2, 3, 4});
 }
