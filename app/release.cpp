@@ -3,8 +3,8 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
-#include "glsl.hpp"
-#include "window.hpp"
+#include "view.hpp"
+#include "streams.hpp"
 
 #include "geometry.hpp"
 #include "model.hpp"
@@ -38,8 +38,8 @@ bool run(std::ostream &dest, int n_frames) {
 	if(!win) return dest << win, false;
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
-	if(!(p[0].source(Source(GLSL_VERT)).compile()
-			&& p[1].source(Source(GLSL_FRAG)).compile()
+	if(!(p[0].source(Streams::Source(GLSL_VERT)).compile()
+			&& p[1].source(Streams::Source(GLSL_FRAG)).compile()
 			&& p.build() && p.use()))
 		return dest << p.info(), false;
 
