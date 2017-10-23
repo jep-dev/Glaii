@@ -70,6 +70,23 @@ namespace Abstract {
 			return *static_cast<D*>(this);
 		}
 	};
+
+	template<typename D>
+	auto get_derived(derived<D>& d) -> D& {
+		return static_cast<D&>(d);
+	}
+	template<typename D>
+	auto get_derived(D& d) -> D& {
+		return d;
+	}
+	template<typename D>
+	auto get_derived(derived<D> const& d) -> D& {
+		return static_cast<D&>(d);
+	}
+	template<typename D>
+	auto get_derived(D const& d) -> D& {
+		return d;
+	}
 	/**
 	 * @brief Base class for types promising implementation.
 	 * @tparam S The type promising or providing the implementation
