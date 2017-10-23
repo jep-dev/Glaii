@@ -5,14 +5,10 @@
 
 namespace Abstract {
 	/** @brief Interface for types supporting calls to update through CRTP.
-	 * @tparam T The derived type of the implementation class
+	 * @tparam D The derived type of the implementation class
 	 */
-	template<typename S>
-	struct Updatable: derived<S> {
-	public:
-		typedef typename derived<S>::derived_type derived_type;
-		using derived<S>::get_derived;
-	};
+	template<typename D>
+	struct Updatable {};
 }
 
 /**
