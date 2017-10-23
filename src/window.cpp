@@ -27,6 +27,9 @@ namespace View {
 	bool Window::validate(void) {
 		return live && (live &= !errors());
 	}
+	bool Window::handle(SDL_QuitEvent const& ev) {
+		return false;
+	}
 	bool Window::handle(SDL_WindowEvent const& ev) {
 		switch(ev.type) {
 			case SDL_WINDOWEVENT_CLOSE: return false;
@@ -39,19 +42,12 @@ namespace View {
 			default: return true;
 		}
 	}
-	bool Window::handle(SDL_Event const& ev) {
-		switch(ev.type) {
-			case SDL_WINDOWEVENT: return handle(ev.window);
-			case SDL_KEYDOWN: return handle(ev.key);
-			case SDL_QUIT: return false;
-			default: return true;
-		}
-	}
 	bool Window::update(unsigned frame) {
 		if(!validate()) return false;
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev))
-			if(!handle(ev)) return false;
+			if(!call_handler(*this, ev)) return false;
+			//if(!handle(ev)) return false;
 		return validate();
 	}
 	bool Window::draw(unsigned frame) {
