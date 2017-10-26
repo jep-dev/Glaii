@@ -1,4 +1,6 @@
 #include "geometry.hpp"
+#include "matrix.hpp"
+
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -14,36 +16,39 @@ using std::setprecision;
 using namespace Geometry;
 
 std::ostream& table(std::ostream& dest) {
-	// Quat_t<float> x[] = {{0,0,0,1}, {1,0,0,0}, {0,1,0,0}, {0,0,1,0}};
-	Quat_t<float> x[] = {{1,0,0,0}, {0,1,0,0}, {0,0,1,0}, {0,0,0,1}};
+	using OSS = std::ostringstream;
+	using std::setw;
+	using std::setfill;
+	using std::endl;
+
 	const std::string sep_str = " | ";
 	const unsigned n = 4, w = 6, sep = sep_str.size();
-	for(unsigned i = 0; i <= n; i++) {
-		std::ostringstream oss;
-		if(i) {
-			oss << x[i-1];
-			dest << ' ' << std::setw(w-2) << oss.str() << ' ';
-		} else {
-			dest << std::setw(w + sep) << "";
-		}
+	Quat_t<float> x[] = {{1,0,0,0}, {0,1,0,0}, {0,0,1,0}, {0,0,0,1}};
+
+	dest << setw(w+sep-1) << "";
+
+	dest << (sep ? '_' : ' ');
+	for(auto i = 0; i < n; i++) {
+		OSS oss;
+		oss << x[i];
+		dest << '_' << setfill('_') << setw(w-2) << oss.str() << '_';
+		dest << setfill(' ');
 	}
-	dest << '\n' << std::setw(w+sep-1) << ""
-			<< std::setw(w*4+1) << std::setfill('_')
-			<< "" << std::setfill(' ') << std::endl;
-	for(unsigned i = 0; i < n; i++) {
+	dest << '\n';
+	for(auto i = 0; i < n; i++) {
 		{
-			std::ostringstream oss;
+			OSS oss;
 			oss << x[i];
-			dest << std::setw(w) << oss.str() << sep_str;
+			dest << setw(w) << oss.str() << sep_str;
 		}
 		for(unsigned j = 0; j < n; j++) {
-			std::ostringstream oss;
+			OSS oss;
 			oss << x[i]*x[j];
-			dest << ' ' << std::setw(w-2) << oss.str() << ' ';
+			dest << ' ' << setw(w-2) << oss.str() << ' ';
 		}
-		endl(dest);
+		dest << '\n';
 	}
-	return dest << '\n';
+	return endl(dest);
 }
 
 int main(int argc, const char *argv[]) {
