@@ -26,8 +26,8 @@ namespace Abstract {
 template<typename S, typename... T, typename... U, typename... V>
 bool update(Abstract::Updatable_t<S> const& s,
 		T &... t, U const&... u, V &&... v) {
-	return static_cast<S *const>(&s)
-		-> update(t..., u..., std::forward<V>(v)...);
+	return static_cast<S const&>(s)
+		.update(t..., u..., std::forward<V>(v)...);
 }
 /**
  * @brief Updates the given subject using its derived implementation
@@ -42,9 +42,10 @@ bool update(Abstract::Updatable_t<S> const& s,
  * @return True if and only if the derived implementation returns true
  */
 template<typename S, typename... T, typename... U, typename... V>
-bool update(Abstract::Updatable_t<S>& s, T &... t, U const&... u, V &&... v) {
-	return static_cast<S*>(&s)
-		-> update(t..., u..., std::forward<V>(v)...);
+bool update(Abstract::Updatable_t<S>& s,
+		T &... t, U const&... u, V &&... v) {
+	return static_cast<S&>(s)
+		.update(t..., u..., std::forward<V>(v)...);
 }
 
 
