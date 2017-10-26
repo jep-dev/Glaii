@@ -53,7 +53,8 @@ bool run(std::ostream &dest, int n_frames) {
 
 	float x0 = -asp, y0 = 1, z0 = -1,
 		  x1 = asp, y1 = 10, z1 = 1,
-		// Using y as near/far axis
+		/* Using y as near/far axis; this retains handedness but makes
+		 * forward, right, and up axes positive in default orientation */
 		m00 = y0/x0, m11 = y0/y1, m2_ = y0-y1,
 		m22 = (y0+y1)/m2_, m23 = 2*y0*y1/m2_,
 		mvp[] = {
