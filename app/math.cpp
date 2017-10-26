@@ -62,14 +62,6 @@ int main(int argc, const char *argv[]) {
 			decltype(rotate(float(M_PI), x)), Quat_t<float>
 		>::value, "LCM(float(double), float) should be float");
 
-	float f1 = float(M_PI)/512, f2 = float(M_PI/512);
-	int i1 = *reinterpret_cast<int*>(&f1),
-		i2 = *reinterpret_cast<int*>(&f2);
-	cout << "f1 = " << f1 << ", f2 = " << f2 << ";\n"
-		<< "f1-f2 = " << (f1-f2) << ";\n"
-		<< "f1_int = " << i1 << "; f2_int = " << i2 << ";\n"
-		<< "f1_int - f2_int = " << (i1 - i2) << endl;
-
 	std::map<const char*, Quat_t<float>> xforms = {
 		{"pi/2 . e_i", rotate<float>(M_PI/2, x)},
 		{"pi/2 . e_j", rotate<float>(M_PI/2, y)},
