@@ -212,6 +212,7 @@ namespace Geometry {
 	}
 	template<typename S, typename T>
 	S& operator<<(S& dest, Quat_t<T> const& src) {
+		dest << std::showpos;
 		bool hit = false;
 		T x[] = {src.w, src.x, src.y, src.z};
 		const char *l[] = {"", "i", "j", "k"};
@@ -226,11 +227,12 @@ namespace Geometry {
 			else dest << ix << il;
 		}
 		if(!hit) dest << "0";
-		return dest;
+		return dest << std::noshowpos;
 	}
 	template<typename S, typename T>
 	S& operator<<(S& dest, Vec_t<T> const& src) {
-		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
+		return dest << std::showpos
+			<< Quat_t<T>{src.x, src.y, src.z, 0} << std::noshowpos;
 	}
 
 	template struct Quat_t<float>;
