@@ -28,6 +28,10 @@
 bool run(std::ostream &dest, int n_frames) {
 	using namespace View;
 	using namespace Shaders;
+	using std::left;
+	using std::right;
+	using std::setw;
+	using std::setfill;
 
 	unsigned w = 640, h = 480;
 	auto asp = float(w)/h; // TODO test aspect easing from view.hpp
@@ -51,7 +55,7 @@ bool run(std::ostream &dest, int n_frames) {
 		  x1 = asp, y1 = 10, z1 = 1,
 		// Using y as near/far axis
 		m00 = y0/x0, m11 = y0/y1, m2_ = y0-y1,
-		m22 = (y0+y1)/m2_, m23 = 2*y0*y0/m2_,
+		m22 = (y0+y1)/m2_, m23 = 2*y0*y1/m2_,
 		mvp[] = {
 			m00,  0,   0,   0,
 			 0,  m11,  0,   0,
@@ -79,8 +83,8 @@ bool run(std::ostream &dest, int n_frames) {
 
 	unsigned frame = 0;
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
-	endl(dest << "Frame" << std::right
-		<< std::setw(9) << std::setfill('.') << "FPS");
+	endl(dest << "Frame" << right
+		<< setw(9) << setfill('.') << "FPS");
 	while(win) {
 		if(!win.draw(frame)) break;
 		auto t1 = SDL_GetPerformanceCounter();
@@ -89,8 +93,8 @@ bool run(std::ostream &dest, int n_frames) {
 			auto freq = SDL_GetPerformanceFrequency();
 			auto fps = float(freq)/(t1-t0);
 			flush(dest << '\r'
-				<< std::setw(5) << std::setfill('.') << std::left << frame
-				<< std::setw(9) << std::right << fps << std::setfill(' '));
+				<< setw(5) << setfill('.') << left << frame
+				<< setw(9) << right << fps << setfill(' '));
 			if((frame & 255) == 0) dest << '\n';
 		}
 		t0 = t1;
