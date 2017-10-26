@@ -227,12 +227,12 @@ namespace Geometry {
 			else dest << ix << il;
 		}
 		if(!hit) dest << "0";
-		return dest << std::noshowpos;
+		dest << std::noshowpos;
+		return dest;
 	}
 	template<typename S, typename T>
 	S& operator<<(S& dest, Vec_t<T> const& src) {
-		return dest << std::showpos
-			<< Quat_t<T>{src.x, src.y, src.z, 0} << std::noshowpos;
+		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
 	}
 
 	template struct Quat_t<float>;
