@@ -16,8 +16,8 @@ namespace Abstract {
 	/*-- CRTP helper types --*/
 	/** @brief Helper type analogous to null-terminator for strings. */
 	struct null_type {};
-	template<typename> struct enable;
-	template<typename> struct derived;
+	template<typename> struct Enable_t;
+	template<typename> struct Derived_t;
 	template<typename T> struct tag_id;
 	/**
 	 * @brief General-purpose type label/tag.
@@ -47,32 +47,32 @@ namespace Abstract {
 
 	/** @brief Helper type used to induce substitution failure in SFINAE. */
 	template<typename>
-	struct enable: std::true_type {};
+	struct Enable_t: std::true_type {};
 
 	template<typename S, typename... T>
 	auto implements(long) -> std::false_type;
 
 	template<typename S, typename... T>
 	auto implements(int)
-		-> enable<decltype(S::apply(std::declval<T>()...))>;
+		-> Enable_t<decltype(S::apply(std::declval<T>()...))>;
 
 	/**
 	 * @brief Helper type using CRTP for compile-time polymorphism.
 	 * @tparam D The type identified final result of derivation
 	 */
 	template<typename D>
-	struct derived {
+	struct Derived_t {
 		typedef D derived_type;
 		D const& get_derived(void) const {
-			return *static_cast<D *const>(this);
+			return static_cast<D const&>(*this);
 		}
 		D& get_derived(void) {
-			return *static_cast<D*>(this);
+			return static_cast<D&>(*this);
 		}
 	};
 
 	template<typename D>
-	auto get_derived(derived<D>& d) -> D& {
+	auto get_derived(Derived_t<D>& d) -> D& {
 		return static_cast<D&>(d);
 	}
 	template<typename D>
@@ -80,7 +80,7 @@ namespace Abstract {
 		return d;
 	}
 	template<typename D>
-	auto get_derived(derived<D> const& d) -> D& {
+	auto get_derived(Derived_t<D> const& d) -> D const& {
 		return static_cast<D&>(d);
 	}
 	template<typename D>

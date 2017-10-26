@@ -11,8 +11,8 @@ namespace Presenter {
 	 * @tparam T The derived class providing the update method
 	 */
 	template<typename T>
-	struct Presenter_t: Abstract::Updatable<T> {
-		using Abstract::Updatable<T>::update;
+	struct Presenter_t: Abstract::Updatable_t<T> {
+		using Abstract::Updatable_t<T>::update;
 	};
 }
 

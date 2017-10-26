@@ -47,7 +47,6 @@ namespace View {
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev))
 			if(!call_handler(*this, ev)) return false;
-			//if(!handle(ev)) return false;
 		return validate();
 	}
 	bool Window::draw(unsigned frame) {

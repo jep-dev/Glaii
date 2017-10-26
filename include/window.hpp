@@ -20,8 +20,8 @@ namespace View {
 
 	/** @brief RAII and operations on an SDL window/context pair. */
 	struct Window:
-		Abstract::derived<Window>,
-		Abstract::Updatable<Window>,
+		Abstract::Derived_t<Window>,
+		Abstract::Updatable_t<Window>,
 		Abstract::Handler_t<Window>
 	{
 	protected:
@@ -41,7 +41,6 @@ namespace View {
 		bool handle(SDL_QuitEvent const& ev);
 		bool handle(SDL_WindowEvent const& ev);
 		bool handle(SDL_KeyboardEvent const& ev);
-		//bool handle(SDL_Event const& ev);
 
 		bool update(unsigned frame);
 		bool draw(unsigned frame);
