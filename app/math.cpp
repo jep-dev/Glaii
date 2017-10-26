@@ -58,6 +58,9 @@ int main(int argc, const char *argv[]) {
 	table(cout);
 
 	static_assert(is_same<
+			Quat_t<double>, decltype(rotate(M_PI, x))
+		>::value, "LCM(float, double) should be double");
+	static_assert(is_same<
 			decltype(rotate(M_PI, x)), Quat_t<double>
 		>::value, "LCM(double, float) should be double");
 	static_assert(is_same<
