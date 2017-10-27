@@ -18,15 +18,15 @@ namespace Streams {
 	using std::ostringstream;
 
 	/** @brief Reads entire ifstream into memory. */
-	struct Source {
+	struct Cutter {
 		const string data;
 		operator const char*(void) const;
 		operator string const&(void) const;
-		Source(void);
-		Source(string && s);
-		Source(string const& s);
-		Source(const char *fname);
-		template<typename S> Source(S && s);
+		Cutter(void);
+		Cutter(string && s);
+		Cutter(string const& s);
+		Cutter(const char *fname);
+		template<typename S> Cutter(S && s);
 	};
 
 	struct Paster {
@@ -134,148 +134,8 @@ namespace Streams {
 			*this << string(t...);
 		}
 	};
-
-	/*std::ostream& border(std::ostream& dest,
-		string const& src, unsigned srcWidth,
-		unsigned westWidth = 2, unsigned eastWidth = 2,
-		bool north = true, bool south = true, char delim = '\n') {
-		auto sp = split(src, srcWidth, delim, false);
-		string westStr(westWidth, ' '), eastStr(eastWidth, ' ');
-		unsigned lineWidth = westWidth + srcWidth + eastWidth;
-		string northStr(lineWidth, '-'),
-			southStr = northStr;
-
-		if(westWidth) {
-			northStr[0] = '.';
-			westStr[0] = '|';
-			southStr[0] = '\'';
-		}
-		if(eastWidth) {
-			northStr[lineWidth-1] = '.';
-			eastStr[eastWidth-1] = '|';
-			southStr[lineWidth-1] = '\'';
-		}
-
-		if(north) dest << northStr << '\n';
-		for(auto const& line : sp) {
-			dest << westStr << line << eastStr << '\n';
-			//dest << '"' << line << '"' << '\n';
-		}
-		if(south) dest << southStr << '\n';
-		return dest;
-	}*/
-	/*std::ostream& border(std::ostream& dest,
-			std::ostringstream const& src, unsigned srcWidth,
-			unsigned westWidth = 2, unsigned eastWidth = 2,
-			bool north = true, bool south = true, char delim = '\n') {
-		return border(dest, src.str(), srcWidth, westWidth, eastWidth,
-			north, south, delim);
-	}*/
-	/*
-	 * @brief Columnates input; emulates GNU paste with aligned newlines
-	 * @param dest The destination of the pasted columns
-	 * @param lhs The contents of the left column
-	 * @param lWidth The width used to wrap lines in the left column
-	 * @param rhs The contents of the right column
-	 * @param rWidth The width used to wrap lines in the right column
-	 * @param sepWidth The width of the separation between columns
-	 * @param delim The character used to identify line boundaries
-	 */
-	/*std::ostream& paste(std::ostream& dest,
-			string const& lhs, unsigned lWidth,
-			string const& rhs, unsigned rWidth,
-			unsigned sepWidth = 3, char delim = '\n') {
-		char div0 = '|', div1 = '|';
-		auto lSplit = split(lhs, lWidth, delim, false),
-			rSplit = split(rhs, rWidth, delim, false);
-		unsigned lHeight = lSplit.size(), rHeight = rSplit.size(),
-			maxHeight = std::max(lHeight, rHeight);
-		if(!maxHeight) return dest;
-		lSplit.reserve(maxHeight);
-		rSplit.reserve(maxHeight);
-		if(lHeight < maxHeight) {
-			std::fill_n(&lSplit[lHeight], maxHeight - lHeight, "");
-		}
-		for(unsigned i = 0; i < maxHeight; i++) {
-			string lStr, rStr;
-			if(i < lHeight) lStr = lSplit[i];
-			if(i < rHeight) rStr = rSplit[i];
-			unsigned lSize = lStr.size(), rSize = rStr.size(),
-					lLines = lSize / lWidth, rLines = rSize / rWidth,
-					maxLines = std::max(lLines, rLines),
-					ldLines = maxLines - lLines,
-					rdLines = maxLines - rLines;
-			if(lLines < maxLines)
-				lStr += string(ldLines*lWidth, ' ');
-			else if(rLines < lLines)
-				rStr += string(rdLines*rWidth, ' ');
-			for(unsigned j = 0; j < maxLines; j++) {
-				dest << lStr.substr(j*lWidth, lWidth);
-				if(sepWidth) {
-					string sepStr(sepWidth, ' ');
-					sepStr[sepWidth - 1 - int(sepWidth/2)] =
-						(j ? div0 : div1);
-					dest << sepStr;
-				}
-				dest << rStr.substr(j*rWidth, rWidth) << '\n';
-			}
-		}
-		return dest;
-	}*/
-	/* std::ostream& paste(std::ostream& dest,
-			std::ostringstream const& lhs, unsigned lWidth,
-			std::ostringstream const& rhs, unsigned rWidth,
-			unsigned sepWidth = 3, char delim = '\n') {
-		return paste(dest, lhs.str(), lWidth,
-			rhs.str(), rWidth, sepWidth, delim);
-	}*/
-	/*
-	 * @brief Columnates input with aligned newlines and outer border
-	 * @param dest The destination of the pasted columns
-	 * @param lhs The contents of the left column
-	 * @param lWidth The width used to wrap lines in the left column
-	 * @param rhs The contents of the right column
-	 * @param rWidth The width used to wrap lines in the right column
-	 * @param sepWidth The width of the separation between columns
-	 * @param bordWidth The width of the left and right outer borders
-	 * @param north Enables horizontal rule prepended to output
-	 * @param south Enables horizontal rule appended to output
-	 * @param delim The character used to identify line boundaries
-	 */
-	/*std::ostream& pasteBorder(std::ostream& dest,
-			string const& lhs, unsigned lWidth,
-			string const& rhs, unsigned rWidth,
-			unsigned sepWidth = 3, unsigned bordWidth = 1,
-			bool north = true, bool south = true,
-			char delim = '\n') {
-		std::ostringstream oss;
-		paste(oss, lhs, lWidth, rhs, rWidth, sepWidth, delim);
-		if(!bordWidth) return dest << oss.str();
-		string src = oss.str(), buf, border(bordWidth, ' ');
-		border[0] = '|';
-		std::istringstream bufRd(src);
-		unsigned j = 0, jw = bordWidth*2 + sepWidth + lWidth + rWidth;
-		if(north) dest << '.' << string(jw-2, '-') << '.' << '\n';
-		while(getline(bufRd, buf, delim)) {
-			dest << border << buf;
-			std::swap(border[0], border[bordWidth-1]);
-			dest << border << '\n';
-			std::swap(border[0], border[bordWidth-1]);
-		}
-		if(south) dest << '\'' << string(jw-2, '-') << '\'' << '\n';
-		return dest;
-	}*/
-
-	/*std::ostream& pasteBorder(std::ostream& dest,
-			std::ostringstream const& lhs, unsigned lWidth,
-			std::ostringstream const& rhs, unsigned rWidth,
-			unsigned sepWidth = 3, unsigned bordWidth = 1,
-			bool north = true, bool south = true,
-			char delim = '\n') {
-		return pasteBorder(dest, lhs.str(), lWidth,
-			rhs.str(), rWidth, sepWidth, bordWidth, north, south, delim);
-	}*/
 }
+
 namespace Geometry {
 	template<typename S, typename T>
 	S& operator<<(S& dest, Quat_t<T> const& src) {

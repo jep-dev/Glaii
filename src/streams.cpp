@@ -1,19 +1,19 @@
 #include "streams.hpp"
 
 namespace Streams {
-	Source::operator string const&(void) const {
+	Cutter::operator string const&(void) const {
 		return data;
 	}
-	Source::operator const char*(void) const {
+	Cutter::operator const char*(void) const {
 		return data.c_str();
 	}
 
-	Source::Source(void) {}
-	Source::Source(string const& s): data(s) {}
-	Source::Source(string && s): data(std::move(s)) {}
+	Cutter::Cutter(void) {}
+	Cutter::Cutter(string const& s): data(s) {}
+	Cutter::Cutter(string && s): data(std::move(s)) {}
 	template<typename S>
-	Source::Source(S && s):
+	Cutter::Cutter(S && s):
 		data(std::istreambuf_iterator<char>(s), {}) {}
-	Source::Source(const char *fname):
-		Source(ifstream(fname)) {}
+	Cutter::Cutter(const char *fname):
+		Cutter(ifstream(fname)) {}
 }

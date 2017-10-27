@@ -42,8 +42,8 @@ bool run(std::ostream &dest, int n_frames) {
 	if(!win) return dest << win, false;
 
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
-	if(!(p[0].source(Streams::Source(GLSL_VERT)).compile()
-			&& p[1].source(Streams::Source(GLSL_FRAG)).compile()
+	if(!(p[0].source(Streams::Cutter(GLSL_VERT)).compile()
+			&& p[1].source(Streams::Cutter(GLSL_FRAG)).compile()
 			&& p.build() && p.use()))
 		return dest << p.info(), false;
 
