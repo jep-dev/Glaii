@@ -35,17 +35,27 @@ bool run(std::ostream &dest, int n_frames) {
 
 	unsigned w = 640, h = 480;
 	auto asp = float(w)/h; // TODO test aspect easing from view.hpp
-	Window win("Title", w, h, SDL_WINDOW_RESIZABLE,
-			{{CTX(PROFILE_MASK), CTX(PROFILE_CORE)},
-			{CTX(MAJOR_VERSION), 3}, {CTX(MINOR_VERSION), 3},
-			{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}});
+	Window win("Title", w, h, SDL_WINDOW_RESIZABLE, {
+		{CTX(PROFILE_MASK), CTX(PROFILE_CORE)},
+		{CTX(MAJOR_VERSION), 3}, {CTX(MINOR_VERSION), 3},
+		{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}
+	});
 	if(!win) return dest << win, false;
 
+	// TODO Reduce to Program<GLenum...>(path...)
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
-	if(!(p[0].source(Streams::Cutter(GLSL_VERT)).compile()
-			&& p[1].source(Streams::Cutter(GLSL_FRAG)).compile()
-			&& p.build() && p.use()))
-		return dest << p.info(), false;
+	const char *paths[] = {GLSL_VERT, GLSL_FRAG};
+	for(auto i = 0; i < 2; i++) {
+		Streams::Cutter cut(paths[i]);
+		if(!cut) return dest << "Could not read "
+			<< paths[i] << '\n', false;
+		if(!p[i].source(cut).compile())
+			return dest << "Could not compile "
+				<< paths[i] << ":\n" << p[i].info(), false;
+	}
+	if(!p.build() || !p.use())
+		return dest << "Could not use shader program\n"
+			<< p.info(), false;
 
 	auto id_mvp = p.uniform("mvp");
 	if(id_mvp == -1)
