@@ -50,6 +50,42 @@ namespace Streams {
 		} while(1);
 		return lines;
 	}
+	std::ostream& border(std::ostream& dest,
+		std::string const& src, unsigned srcWidth,
+		unsigned westWidth = 2, unsigned eastWidth = 2,
+		bool north = true, bool south = true, char delim = '\n') {
+		auto sp = split(src, srcWidth, delim);
+		std::string westStr(westWidth, ' '), eastStr(eastWidth, ' ');
+		unsigned lineWidth = westWidth + srcWidth + eastWidth;
+		std::string northStr(lineWidth, '-'),
+			southStr = northStr;
+
+		if(westWidth) {
+			northStr[0] = '.';
+			westStr[0] = '|';
+			southStr[0] = '\'';
+		}
+		if(eastWidth) {
+			northStr[lineWidth-1] = '.';
+			eastStr[eastWidth-1] = '|';
+			southStr[lineWidth-1] = '\'';
+		}
+
+		if(north) dest << northStr << '\n';
+		for(auto const& line : sp) {
+			dest << westStr << line << eastStr << '\n';
+			//dest << '"' << line << '"' << '\n';
+		}
+		if(south) dest << southStr << '\n';
+		return dest;
+	}
+	std::ostream& border(std::ostream& dest,
+			std::ostringstream const& src, unsigned srcWidth,
+			unsigned westWidth = 2, unsigned eastWidth = 2,
+			bool north = true, bool south = true, char delim = '\n') {
+		return border(dest, src.str(), srcWidth, westWidth, eastWidth,
+			north, south, delim);
+	}
 	/**
 	 * @brief Columnates input; emulates GNU paste with aligned newlines
 	 * @param dest The destination of the pasted columns
@@ -101,6 +137,13 @@ namespace Streams {
 		}
 		return dest;
 	}
+	std::ostream& paste(std::ostream& dest,
+			std::ostringstream const& lhs, unsigned lWidth,
+			std::ostringstream const& rhs, unsigned rWidth,
+			unsigned sepWidth = 3, char delim = '\n') {
+		return paste(dest, lhs.str(), lWidth,
+			rhs.str(), rWidth, sepWidth, delim);
+	}
 	/**
 	 * @brief Columnates input with aligned newlines and outer border
 	 * @param dest The destination of the pasted columns
@@ -137,6 +180,16 @@ namespace Streams {
 		if(south) dest << '\'' << std::string(jw-2, '-') << '\'' << '\n';
 		return dest;
 	}
+
+	std::ostream& pasteBorder(std::ostream& dest,
+			std::ostringstream const& lhs, unsigned lWidth,
+			std::ostringstream const& rhs, unsigned rWidth,
+			unsigned sepWidth = 3, unsigned bordWidth = 1,
+			bool north = true, bool south = true,
+			char delim = '\n') {
+		return pasteBorder(dest, lhs.str(), lWidth,
+			rhs.str(), rWidth, sepWidth, bordWidth, north, south, delim);
+	}
 }
 namespace Geometry {
 	template<typename S, typename T>
@@ -163,17 +216,20 @@ namespace Geometry {
 	S& operator<<(S& dest, Vec_t<T> const& src) {
 		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
 	}
-	/*template<typename S, typename T>
+	template<typename S, typename T>
 	S& operator<<(S& dest, Matrix_t<T> const& m) {
 		dest << std::showpos;
-		for(auto i = 0; i < 4; i++) {
-			for(auto j = i << 2; j < 4; j++) {
-				dest << m[j] << ' ';
+		for(auto i = 0; i < 16;) {
+			for(auto j = 0; j < 4; i++, j++) {
+				if(j) dest << ' ';
+				auto mij = m[i|j];
+				dest << (near_zero(mij) ? 0 : mij);
 			}
+			if(i < 16) dest << '\n';
 		}
 		dest << std::noshowpos;
 		return dest;
-	}*/
+	}
 }
 
 #endif
