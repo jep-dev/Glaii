@@ -5,8 +5,8 @@
 
 #include <math.h>
 
-#ifndef INTOLERANCE
-#define INTOLERANCE 512
+#ifndef TOLERANCE
+#define TOLERANCE 512
 #endif
 
 namespace Geometry {
@@ -187,14 +187,25 @@ namespace Geometry {
 	 * @brief Fuzzy comparison to zero (avoids division due to aliasing)
 	 * @tparam L The domain of the value to compare
 	 * @param l The subject to compare to the range endpoints
-	 * @param prox The proximity factor, or inverse tolerance
+	 * @param prox The proximity or tolerance factor
 	 * @return True if and only if the value is within [-1,1] after
-	 * multiplication with the given or default proximity/'intolerance'
+	 * multiplication with the given or default proximity
 	 */
 	template<typename L>
-	bool near_zero(L const& l, unsigned prox = INTOLERANCE) {
+	bool nearZero(L const& l, unsigned prox = TOLERANCE) {
 		auto lp = l * prox;
 		return lp >= -1 && lp <= 1;
+	}
+	/**
+	 * @brief Rounds to zero by fuzzy comparison
+	 * @tparam T The domain of the value to round
+	 * @param t The subject to round
+	 * @param prox The proximity or tolerance factor
+	 * @return A copy of t, or zero if t is within prox of zero
+	 */
+	template<typename T>
+	T roundNearZero(T const& t, unsigned prox = TOLERANCE) {
+		return nearZero(t, prox) ? T(0) : t;
 	}
 	/**
 	 * @brief Fuzzy comparison of multidimensional values
@@ -202,13 +213,13 @@ namespace Geometry {
 	 * @tparam R Type of the object with magnitude method
 	 * @param l The subject or subtrahend of the comparison
 	 * @param r The object or minuend of the comparison
-	 * @param prox The proximity factor, or inverse tolerance
+	 * @param prox The proximity or tolerance factor
 	 * @return True if and only if the magnitude of the difference of
 	 * inputs is near zero
 	 */
 	template<typename L, typename R>
-	bool near(L const& l, R const& r, unsigned prox = INTOLERANCE) {
-		return near_zero((r-l).magnitude(), prox);
+	bool near(L const& l, R const& r, unsigned prox = TOLERANCE) {
+		return nearZero((r-l).magnitude(), prox);
 	}
 
 	template struct Quat_t<float>;
