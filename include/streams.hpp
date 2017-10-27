@@ -1,6 +1,9 @@
 #ifndef STREAMS_HPP
 #define STREAMS_HPP
 
+#include "geometry.hpp"
+#include "matrix.hpp"
+
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -134,6 +137,43 @@ namespace Streams {
 		if(south) dest << '\'' << std::string(jw-2, '-') << '\'' << '\n';
 		return dest;
 	}
+}
+namespace Geometry {
+	template<typename S, typename T>
+	S& operator<<(S& dest, Quat_t<T> const& src) {
+		dest << std::showpos;
+		bool hit = false;
+		T x[] = {src.w, src.x, src.y, src.z};
+		const char *l[] = {"", "i", "j", "k"};
+		for(unsigned i = 0; i < 4; i++) {
+			auto ix = x[i];
+			auto il = l[i];
+			if(near_zero(ix)) continue;
+			hit = true;
+			auto ax = float(abs(ix));
+			if(i && near_zero(ax - 1))
+				dest << ((ix < 0) ? "-" : "+") << il;
+			else dest << ix << il;
+		}
+		if(!hit) dest << "0";
+		dest << std::noshowpos;
+		return dest;
+	}
+	template<typename S, typename T>
+	S& operator<<(S& dest, Vec_t<T> const& src) {
+		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
+	}
+	/*template<typename S, typename T>
+	S& operator<<(S& dest, Matrix<T> const& m) {
+		dest << std::showpos;
+		for(auto i = 0; i < 4; i++) {
+			for(auto j = i << 2; j < 4; j++) {
+				dest << m[j] << ' ';
+			}
+		}
+		dest << std::noshowpos;
+		return dest;
+	}*/
 }
 
 #endif
