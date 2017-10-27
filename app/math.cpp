@@ -1,5 +1,6 @@
 #include "geometry.hpp"
 #include "matrix.hpp"
+#include "streams.hpp"
 
 #include <iostream>
 #include <iomanip>
