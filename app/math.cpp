@@ -12,16 +12,70 @@
 using std::cout;
 using std::endl;
 using std::setw;
+using std::setfill;
 using std::setprecision;
+using OS = std::ostream;
+using OSS = std::ostringstream;
 
 using namespace Geometry;
 
-std::ostream& table(std::ostream& dest) {
-	using OSS = std::ostringstream;
-	using std::setw;
-	using std::setfill;
-	using std::endl;
+OS& matrices(OS& dest) {
+	using Streams::paste;
+	using Streams::border;
+	using Streams::pasteBorder;
+	auto theta = M_PI/2;
+	float fcos = float(cos(theta)), fsin = float(sin(theta));
+	auto mat0 = Matrix_t<decltype(theta)>::identity();
+	Matrix_t<float> mat1 = {
+		fcos,-fsin, 0, 0,
+		fsin, fcos, 0, 0,
+		   0,    0, 1, 0,
+		   0,    0, 0, 1
+	}, mat2 = {
+		fcos, 0,-fsin, 0,
+		0,    1,    0, 0,
+		fsin, 0, fcos, 0,
+		0,    0,    0, 1
+	};
+	auto mat01 = mat0 * mat1;
+	auto mat12 = mat1 * mat2;
 
+	static_assert(std::is_same<
+			decltype(mat01), decltype(mat0)
+		>::value, "LCM(double, float) should be double");
+
+	auto wMat = 11, wBord = 3;
+	{
+		auto accum = 0;
+		OSS lhs, rhs, res,
+			bordLhs, bordRhs, bordRes, out01, out12;
+		lhs << mat1;
+		rhs << mat2;
+		res << mat12;
+		border(bordLhs, lhs, wMat, 2, 2);
+		border(bordRhs, rhs, wMat, 0, 2);
+		border(bordRes, res, wMat, 2, 2);
+		paste(out01, bordLhs, wMat+4, bordRhs, wMat+2, 0);
+		paste(out12, out01.str(), wMat*2+6, "\n\n = ", 3, 0);
+		paste(dest, out12, wMat*2+9, bordRes, wMat+4, 0);
+	}
+
+
+	{
+		auto accum = 0;
+		OSS lhs, res, bordLhs, bordRes, out2, out3;
+		lhs << mat12;
+		res << mat12.transpose();
+		border(bordLhs, lhs, wMat, 2, 2);
+		border(bordRes, res, wMat, 2, 2);
+		paste(out2, bordRes.str(), accum += wMat+4, "T\n\n = ", 3, 0);
+		paste(dest, out2, accum+3, bordLhs, wMat+4, 0);
+	}
+
+	return dest;
+}
+
+OS& table(OS& dest) {
 	const std::string sep_str = " | ";
 	const unsigned n = 4, w = 6, sep = sep_str.size();
 	Quat_t<float> x[] = {{1,0,0,0}, {0,1,0,0}, {0,0,1,0}, {0,0,0,1}};
@@ -85,4 +139,5 @@ int main(int argc, const char *argv[]) {
 			cout << "    p = " << p << " --> qpq* = " << q*p << endl;
 		}
 	}
+	matrices(cout);
 }
