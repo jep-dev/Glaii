@@ -164,7 +164,7 @@ namespace Geometry {
 		return dest << Quat_t<T>{src.x, src.y, src.z, 0};
 	}
 	/*template<typename S, typename T>
-	S& operator<<(S& dest, Matrix<T> const& m) {
+	S& operator<<(S& dest, Matrix_t<T> const& m) {
 		dest << std::showpos;
 		for(auto i = 0; i < 4; i++) {
 			for(auto j = i << 2; j < 4; j++) {

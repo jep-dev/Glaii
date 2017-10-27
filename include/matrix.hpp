@@ -9,12 +9,12 @@ namespace Geometry {
 	using namespace gl;
 
 	template<typename S = GLfloat>
-	struct Matrix;
+	struct Matrix_t;
 
 	template<typename S>
-	struct Matrix {
+	struct Matrix_t {
 		S data[16];
-		static Matrix<S> identity(void) {
+		static Matrix_t<S> identity(void) {
 			return {
 				1, 0, 0, 0,
 				0, 1, 0, 0,
@@ -22,7 +22,7 @@ namespace Geometry {
 				0, 0, 0, 1
 			};
 		}
-		Matrix<S> transpose(void) const {
+		Matrix_t<S> transpose(void) const {
 			return {
 				data[ 0], data[ 4], data[ 8], data[12],
 				data[ 1], data[ 5], data[ 9], data[13],
@@ -37,12 +37,12 @@ namespace Geometry {
 			return data[N];
 		}
 		template<typename T>
-		Matrix<S> operator=(Matrix<T> const& r) {
+		Matrix_t<S> operator=(Matrix_t<T> const& r) {
 			std::copy(&r[0], &r[0]+16, data);
 			return *this;
 		}
 		template<typename T>
-		Matrix<COMBINE(S,*,T)> operator*(Matrix<T> const& r) {
+		Matrix_t<COMBINE(S,*,T)> operator*(Matrix_t<T> const& r) {
 			return {
 				data[ 0]*r[ 0] + data[ 1]*r[ 4]
 					+ data[ 2]*r[ 8] + data[ 3]*r[12],
