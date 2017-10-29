@@ -63,28 +63,28 @@ namespace Abstract {
 	template<typename D>
 	struct Derived_t {
 		typedef D derived_type;
-		D const& get_derived(void) const {
+		D const& getDerived(void) const {
 			return static_cast<D const&>(*this);
 		}
-		D& get_derived(void) {
+		D& getDerived(void) {
 			return static_cast<D&>(*this);
 		}
 	};
 
 	template<typename D>
-	auto get_derived(Derived_t<D>& d) -> D& {
+	auto getDerived(Derived_t<D>& d) -> D& {
 		return static_cast<D&>(d);
 	}
 	template<typename D>
-	auto get_derived(D& d) -> D& {
+	auto getDerived(D& d) -> D& {
 		return d;
 	}
 	template<typename D>
-	auto get_derived(Derived_t<D> const& d) -> D const& {
+	auto getDerived(Derived_t<D> const& d) -> D const& {
 		return static_cast<D&>(d);
 	}
 	template<typename D>
-	auto get_derived(D const& d) -> D& {
+	auto getDerived(D const& d) -> D& {
 		return d;
 	}
 	/**
