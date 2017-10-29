@@ -2,16 +2,83 @@
 
 namespace View {
 namespace Shaders {
-	int shaderiv(GLuint id, GLenum k, int src, int *dest) {
-		if(!dest) dest = &src;
-		return glGetShaderiv(id, k, dest), *dest;
+	/*GLint queryIv(GLuint id, GLenum k, GLint *pdest,
+			void (*fnQuery) (GLuint, GLenum, GLint*)) {
+		GLint dest = -1;
+		if(!pdest) pdest = &dest;
+		(*fnQuery) (id, k, pdest);
+		return *pdest;
+	}*/
+	GLint queryIv(GLuint id, GLenum k, GLint *pdest) {
+		if(glIsShader(id)) return shaderIv(id, k, pdest);
+		if(glIsProgram(id)) return programIv(id, k, pdest);
+		return -1;
 	}
-	int programiv(GLuint id, GLenum k, int src, int *dest) {
-		if(!dest) dest = &src;
-		return glGetProgramiv(id, k, dest), *dest;
+	GLint shaderIv(GLuint id, GLenum k, GLint *pdest) {
+		GLint dest = -1;
+		if(!pdest) pdest = &dest;
+		glGetShaderiv(id, k, pdest);
+		return *pdest;
 	}
-	Shader::operator GLuint(void) const { return id; }
-	Shader const& Shader::source(std::string const& s) const {
+	GLint programIv(GLuint id, GLenum k, GLint *pdest) {
+		GLint dest = -1;
+		if(!pdest) pdest = &dest;
+		glGetProgramiv(id, k, pdest);
+		return *pdest;
+	}
+	bool queryAssertIv(GLuint id, GLenum key, GLint val) {
+		return val == queryIv(id, key);
+	}
+	bool shaderAssertIv(GLuint id, GLenum key, GLint val) {
+		return val == shaderIv(id, key);
+	}
+	bool programAssertIv(GLuint id, GLenum key, GLint val) {
+		return val == programIv(id, key);
+	}
+	std::string programInfo(GLuint id) {
+		auto len = programIv(id, GL_INFO_LOG_LENGTH);
+		GLchar buf[len];
+		glGetProgramInfoLog(id, len, 0, buf);
+		return buf;
+		//return std::string(buf);
+	}
+	std::string shaderInfo(GLuint id) {
+		auto len = shaderIv(id, GL_INFO_LOG_LENGTH);
+		GLchar buf[len];
+		glGetShaderInfoLog(id, len, 0, buf);
+		return buf;
+		//return std::string(buf);
+	}
+	std::string queryInfo(GLuint id) {
+		if(glIsProgram(id)) return programInfo(id);
+		if(glIsShader(id)) return shaderInfo(id);
+		return "(no info available)";
+	}
+
+	Shader::operator GLuint(void) const {
+		return m_id;
+	}
+	bool Shader::build(void) const {
+		if(m_isShader) {
+			if(shaderAssertIv(m_id, GL_SHADER_SOURCE_LENGTH, 0))
+				return false;
+			glCompileShader(m_id);
+			return shaderAssertIv(m_id,
+				GL_COMPILE_STATUS, GLint(GL_TRUE));
+		}
+		if(m_isProgram) {
+			if(programAssertIv(m_id, GL_ATTACHED_SHADERS, 0))
+				return false;
+			glLinkProgram(m_id);
+			return programAssertIv(m_id, GL_LINK_STATUS, GLint(GL_TRUE));
+		}
+		return false;
+	}
+	std::string Shader::info(void) const {
+		return queryInfo(m_id);
+	}
+
+	/*Shader const& Shader::source(std::string const& s) const {
 		if(!is_shader) return *this;
 		auto sc = s.c_str();
 		glShaderSource(id, 1, &sc, NULL);
@@ -45,21 +112,19 @@ namespace Shaders {
 			glGetProgramInfoLog(id, ilen, NULL, buf);
 		} else return "";
 		return {buf};
+	}*/
+	Shader::Shader(void): m_id(glCreateProgram()) {}
+	Shader::Shader(GLenum E): m_id(glCreateShader(E)) {}
+	Shader::Shader(GLenum E, std::string const& src):
+			m_id(glCreateShader(E)) {
+		if(!src.size()) return;
+		auto szSrc = src.c_str();
+		glShaderSource(m_id, 1, &szSrc, 0);
 	}
-	GLint Shader::operator()(GLenum i) const {
-		return is_shader ? shaderiv(id, i)
-			: is_program ? programiv(id, i) : 0;
-	}
-	bool Shader::operator()(GLenum i, int match) const {
-		return match == (*this)(i);
-	}
-	Shader::Shader(void): Shader(glCreateProgram()) {}
-	Shader::Shader(GLenum E): Shader(glCreateShader(E)) {}
-	Shader::Shader(GLuint id): id(id) {}
 	Shader::~Shader(void) {
-		if((*this)(GL_DELETE_STATUS, int(GL_TRUE))) return;
-		if(is_shader) glDeleteShader(id);
-		else if(is_program) glDeleteProgram(id);
+		if(queryAssertIv(m_id, GL_DELETE_STATUS, GLint(GL_TRUE))) return;
+		if(m_isShader) glDeleteShader(m_id);
+		else if(m_isProgram) glDeleteProgram(m_id);
 	}
 }
 }
