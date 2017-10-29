@@ -43,8 +43,9 @@ bool run(std::ostream &dest, int n_frames) {
 	if(!win) return dest << win, false;
 
 	// TODO Reduce to Program<GLenum...>(path...)
-	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p;
-	const char *paths[] = {GLSL_VERT, GLSL_FRAG};
+	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
+	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
+	/*const char *paths[] = {GLSL_VERT, GLSL_FRAG};
 	for(auto i = 0; i < 2; i++) {
 		Streams::Cutter cut(paths[i]);
 		if(!cut) return dest << "Could not read "
@@ -56,6 +57,11 @@ bool run(std::ostream &dest, int n_frames) {
 	if(!p.build() || !p.use())
 		return dest << "Could not use shader program\n"
 			<< p.info(), false;
+	*/
+	if(!p.build())
+		return dest << "Could not build shader program\n"
+			<< p.info(), false;
+	p.use();
 
 	auto id_mvp = p.uniform("mvp");
 	if(id_mvp == -1)
