@@ -52,11 +52,6 @@ namespace View {
 			const bool m_isProgram = bool(glIsProgram(m_id)),
 				m_isShader = !m_isProgram && glIsShader(m_id);
 			operator GLuint(void) const;
-			// Shader const& source(std::string const& s) const;
-			// bool attach(GLuint s) const;
-			// bool compile(void) const;
-			// bool link(void) const;
-			// bool validate(void) const;
 			bool build(void) const;
 			std::string info(void) const;
 			Shader(void);
@@ -85,20 +80,6 @@ namespace View {
 			Shader const& operator[](unsigned index) const {
 				return shaders[index];
 			}
-			/*
-			bool attach(void) const {
-				bool ret = true;
-				for(auto i = 0; i < N; i++)
-					ret &= program.attach(shaders[i]);
-				return ret;
-			}
-			bool link(void) const {
-				return program.link();
-			}
-			bool validate(void) const {
-				return program.validate();
-			}
-			*/
 			bool build(void) const {
 				for(auto i = 0; i < N; i++)
 					if(!shaders[i].build()) return false;
@@ -124,8 +105,6 @@ namespace View {
 			bool use(void) const {
 				if(!programAssertIv(m_id, GL_LINK_STATUS, GLint(GL_TRUE)))
 					return false;
-				/*if(GL_TRUE != programIv(program, GL_LINK_STATUS))
-					return false;*/
 				glUseProgram(m_id);
 				return true;
 			}

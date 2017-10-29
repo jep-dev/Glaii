@@ -2,13 +2,6 @@
 
 namespace View {
 namespace Shaders {
-	/*GLint queryIv(GLuint id, GLenum k, GLint *pdest,
-			void (*fnQuery) (GLuint, GLenum, GLint*)) {
-		GLint dest = -1;
-		if(!pdest) pdest = &dest;
-		(*fnQuery) (id, k, pdest);
-		return *pdest;
-	}*/
 	GLint queryIv(GLuint id, GLenum k, GLint *pdest) {
 		if(glIsShader(id)) return shaderIv(id, k, pdest);
 		if(glIsProgram(id)) return programIv(id, k, pdest);
@@ -78,41 +71,6 @@ namespace Shaders {
 		return queryInfo(m_id);
 	}
 
-	/*Shader const& Shader::source(std::string const& s) const {
-		if(!is_shader) return *this;
-		auto sc = s.c_str();
-		glShaderSource(id, 1, &sc, NULL);
-		return *this;
-	}
-	bool Shader::compile(void) const {
-		return is_shader && (*this)(GL_SHADER_SOURCE_LENGTH)
-			&& (glCompileShader(id),
-				(*this)(GL_COMPILE_STATUS, int(GL_TRUE)));
-	}
-	bool Shader::attach(GLuint s) const {
-		if(!is_program || !glIsShader(s)) return false;
-		auto pre = (*this)(GL_ATTACHED_SHADERS);
-		glAttachShader(id, s);
-		return (*this)(GL_ATTACHED_SHADERS, pre + 1);
-	}
-	bool Shader::link(void) const {
-		return is_program && (glLinkProgram(id),
-			(*this)(GL_LINK_STATUS, int(GL_TRUE)));
-	}
-	bool Shader::validate(void) const {
-		return is_program && (glValidateProgram(id),
-			(*this)(GL_VALIDATE_STATUS, int(GL_TRUE)));
-	}
-	std::string Shader::info(void) const {
-		auto ilen = (*this)(GL_INFO_LOG_LENGTH);
-		GLchar buf[ilen+1] = {0};
-		if(is_shader) {
-			glGetShaderInfoLog(id, ilen, NULL, buf);
-		} else if(is_program) {
-			glGetProgramInfoLog(id, ilen, NULL, buf);
-		} else return "";
-		return {buf};
-	}*/
 	Shader::Shader(void): m_id(glCreateProgram()) {}
 	Shader::Shader(GLenum E): m_id(glCreateShader(E)) {}
 	Shader::Shader(GLenum E, std::string const& src):
