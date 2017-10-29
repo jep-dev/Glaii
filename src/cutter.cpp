@@ -1,4 +1,5 @@
 #include "streams.hpp"
+#include "cutter.hpp"
 
 namespace Streams {
 	Cutter::operator bool(void) const {
