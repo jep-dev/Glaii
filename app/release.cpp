@@ -45,19 +45,6 @@ bool run(std::ostream &dest, int n_frames) {
 	// TODO Reduce to Program<GLenum...>(path...)
 	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
-	/*const char *paths[] = {GLSL_VERT, GLSL_FRAG};
-	for(auto i = 0; i < 2; i++) {
-		Streams::Cutter cut(paths[i]);
-		if(!cut) return dest << "Could not read "
-			<< paths[i] << '\n', false;
-		if(!p[i].source(cut).compile())
-			return dest << "Could not compile "
-				<< paths[i] << ":\n" << p[i].info(), false;
-	}
-	if(!p.build() || !p.use())
-		return dest << "Could not use shader program\n"
-			<< p.info(), false;
-	*/
 	if(!p.build())
 		return dest << "Could not build shader program\n"
 			<< p.info(), false;
