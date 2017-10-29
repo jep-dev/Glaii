@@ -102,6 +102,12 @@ namespace View {
 				return programAssertIv(m_id,
 					GL_VALIDATE_STATUS, GLint(GL_TRUE));
 			}
+			std::string info(void) const {
+				std::string out;
+				for(auto i = 0; i < N; i++)
+					out += shaders[i].info();
+				return out + programInfo(m_id);
+			}
 			bool use(void) const {
 				if(!programAssertIv(m_id, GL_LINK_STATUS, GLint(GL_TRUE)))
 					return false;
