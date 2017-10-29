@@ -25,7 +25,7 @@ namespace View {
 		 * @param k The key for the given value
 		 * @param pdest Pointer to the value to assign to (optional)
 		 * @return The resulting value, potentially referenced by pdest */
-		GLint programIv(GLuint id, GLenum k, GLint *dest = 0);
+		GLint programIv(GLuint id, GLenum k, GLint *pdest = 0);
 
 		/** @brief Sets and returns the deduced query result. */
 		GLint queryIv(GLuint id, GLenum k, GLint *dest = 0);
