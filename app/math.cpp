@@ -22,6 +22,7 @@ using namespace Geometry;
 OS& matrices(OS& dest) {
 	using std::is_same;
 	using Streams::Paster;
+	using Streams::column;
 	auto theta = M_PI/2;
 	float fcos = float(cos(theta)), fsin = float(sin(theta));
 	auto mat0 = Matrix_t<decltype(theta)>::identity();
@@ -57,7 +58,7 @@ OS& matrices(OS& dest) {
 		Paster paster;
 		OSS oss2;
 		oss2 << mat1.transpose();
-		paster << oss1 << "T\n  =" << oss2;
+		paster << oss1 << " T\n  = " << oss2;
 		dest << paster;
 	}
 	endl(dest);
@@ -66,8 +67,8 @@ OS& matrices(OS& dest) {
 
 OS& quaternions(OS& dest) {
 	using Streams::Paster;
+	using Streams::column;
 	using std::is_same;
-	//const std::string sep_str = " | ";
 	{
 		Quat_t<float> x[] = {
 			{1,0,0,0},
@@ -78,15 +79,18 @@ OS& quaternions(OS& dest) {
 
 		Paster paster;
 		OSS col;
-		paster.column("", x[0], x[1], x[2], x[3])
-			.repeat("", 1, '|', 4);
+		paster.repeat("", 1, "| ", 4)
+			<< column("", x[0], x[1], x[2], x[3]);
+		paster.repeat("", 1, " | ", 4);
 		for(auto i = 0; i < 4; i++)
-			(paster << "  ").column(x[i], x[0]*x[i],
-				x[1]*x[i], x[2]*x[i], x[3]*x[i]);
+			paster << (i ? " " : "")
+				<< column(x[i], x[0]*x[i],
+					x[1]*x[i], x[2]*x[i], x[3]*x[i]);
 		dest << paster;
 	}
 
 	{
+		Paster paster;
 		Vec_t<float> x = {1,0,0}, y = {0,1,0}, z = {0,0,1};
 		Quat_t<float> ident = {0,0,0,1};
 		static_assert(is_same<
@@ -102,21 +106,21 @@ OS& quaternions(OS& dest) {
 				decltype(rotate(float(M_PI), x)), Quat_t<float>
 			>::value, "LCM(float(double), float) should be float");
 
-		// TODO
-		/*std::map<const char*, Quat_t<float>> xforms = {
-			{"pi/2 . e_i", rotate<float>(M_PI/2, x)},
-			{"pi/2 . e_j", rotate<float>(M_PI/2, y)},
-			{"pi/2 . e_k", rotate<float>(M_PI/2, z)}
-		};
-		for(auto const& kv : xforms) {
-			auto const& label = kv.first;
-			auto const& q = kv.second;
-			cout << "Rotation Q = " << label << ":\n  q   = " << q
-				<< "\n  q*  = " << *q << "\n  qq* = " << (q**q) << endl;
-			for(auto const& p : { x, y, z }) {
-				cout << "    p = " << p << " --> qpq* = " << q*p << endl;
-			}
-		}*/
+		float deg90 = M_PI/2;
+		const char *szAxes[] = {"e_i", "e_j", "e_k"},
+			*szRots[] = {"* e_i, ", "* e_j, ", "* e_k"};
+		Quat_t<float> rotAxes[] =
+			{ rotate(deg90, x), rotate(deg90, y), rotate(deg90, z) };
+		paster.column("Axis", szAxes[0], szAxes[1], szAxes[2])
+			.repeat("", 1, " -> ", 3)
+			.column("1/4 turn", rotAxes[0], rotAxes[1], rotAxes[2])
+			.repeat(" ", 4)
+			.column(szRots[0], rotAxes[0]*x, rotAxes[1]*x, rotAxes[2]*x)
+			.repeat(" ", 4)
+			.column(szRots[1], rotAxes[0]*y, rotAxes[1]*y, rotAxes[2]*y)
+			.repeat(" ", 4)
+			.column(szRots[2], rotAxes[0]*z, rotAxes[1]*z, rotAxes[2]*z);
+		dest << paster;
 	}
 	return dest;
 }

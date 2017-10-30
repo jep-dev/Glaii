@@ -57,10 +57,12 @@ namespace Geometry {
 	template<typename S, typename T>
 	S& operator<<(S& dest, Matrix_t<T> const& m) {
 		Streams::Paster paster;
-		for(auto i = 0; i < 4; i++)
-			(paster << " ").column(roundNearZero(m[i]),
+		for(auto i = 0; i < 4; i++) {
+			if(i) paster << ' ';
+			paster.column(roundNearZero(m[i]),
 				roundNearZero(m[i+4]), roundNearZero(m[i+8]),
-				roundNearZero(m[i+12])) << (i ? " " : "");
+				roundNearZero(m[i+12])); // << " "; // << (i ? " " : "");
+		}
 		dest << paster;
 		return dest;
 	}

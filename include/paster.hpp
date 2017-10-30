@@ -2,6 +2,21 @@
 #define PASTER_HPP
 
 namespace Streams {
+	template<typename... TN>
+	ostringstream column(ostringstream && oss, TN const&... tn) {
+		return std::move(oss);
+	}
+	template<typename T0, typename... TN>
+	ostringstream column(ostringstream && oss,
+			T0 const& t0, TN const&... tn) {
+		oss << t0 << '\n';
+		return column(std::move(oss), tn...);
+	}
+	template<typename... TN>
+	ostringstream column(TN const&... tn) {
+		ostringstream oss;
+		return column(std::move(oss), tn...);
+	}
 	struct Paster {
 	protected:
 		std::vector<string> data;
