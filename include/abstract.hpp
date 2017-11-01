@@ -49,13 +49,6 @@ namespace Abstract {
 	template<typename>
 	struct Enable_t: std::true_type {};
 
-	template<typename S, typename... T>
-	auto implements(long) -> std::false_type;
-
-	template<typename S, typename... T>
-	auto implements(int)
-		-> Enable_t<decltype(S::apply(std::declval<T>()...))>;
-
 	/**
 	 * @brief Helper type using CRTP for compile-time polymorphism.
 	 * @tparam D The type identified final result of derivation
@@ -87,13 +80,6 @@ namespace Abstract {
 	auto getDerived(D const& d) -> D& {
 		return d;
 	}
-	/**
-	 * @brief Base class for types promising implementation.
-	 * @tparam S The type promising or providing the implementation
-	 * @tparam T The types of arguments into the promised function
-	 */
-	template<typename S, typename... T>
-	struct intf_require: decltype(implements<S,T...>(0)) {};
 
 	/*
 	 * @brief Creates a new sequence of UIDs for each template argument
