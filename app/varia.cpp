@@ -4,10 +4,14 @@
 using namespace Abstract;
 
 template<template<typename...> class> struct Tag_tt;
+template<template<typename...> class TT> struct Tag_tt {
+	using type = Tag_tt<TT>;
+};
+template<typename...> struct Tagged_tt {};
 
 template<typename... TN> struct Tags_t;
 template<typename... TN> struct Tags_t {
-	//using type = Tags_t<TN...>;
+	using type = Tags_t<TN...>;
 	template<typename... SN>
 	constexpr auto operator<<(Tags_t<SN...> const&) const
 		-> Tags_t<TN...,SN...> { return {}; }
@@ -33,6 +37,9 @@ int main(int argc, const char *argv[]) {
 	constexpr auto t1 = Tags_t<char> {};
 	apply(t0);
 	apply(t1);
-	apply(tagAppend(t0, t1));
 	apply(t0 >> t1);
+	apply(tagAppend(t0, t1));
+	constexpr auto tt0 = Tag_tt<Tagged_tt> {};
+	constexpr auto tt1 = decltype(tt0)::type {};
+	apply(Tags_t<Tag_tt<Tagged_tt>>{});
 }
