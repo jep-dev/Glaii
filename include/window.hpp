@@ -5,8 +5,6 @@
 
 #include <map>
 #include <glbinding/Binding.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_timer.h>
 
 namespace View {
 	using namespace gl;
