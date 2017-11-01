@@ -1,7 +1,7 @@
 #ifndef GLSL_HPP
 #define GLSL_HPP
 
-#include <SDL2/SDL_video.h>
+// #include <SDL2/SDL_video.h>
 
 namespace View {
 	using namespace Abstract;
@@ -19,7 +19,7 @@ namespace View {
 		 * @param k The key for the given value
 		 * @param pdest Pointer to the value to assign to (optional)
 		 * @return The resulting value, potentially referenced by pdest */
-		GLint shaderIv(GLuint id, GLenum k, GLint *dest = 0);
+		GLint shaderIv(GLuint id, GLenum k, GLint *pdest = 0);
 		/** @brief Sets and returns the value for the given program.
 		 * @param id The SDL-issued shader program id
 		 * @param k The key for the given value
@@ -28,7 +28,7 @@ namespace View {
 		GLint programIv(GLuint id, GLenum k, GLint *pdest = 0);
 
 		/** @brief Sets and returns the deduced query result. */
-		GLint queryIv(GLuint id, GLenum k, GLint *dest = 0);
+		GLint queryIv(GLuint id, GLenum k, GLint *pdest = 0);
 		/** @brief Compares the query result to the given target. */
 		bool shaderAssertIv(GLuint id, GLenum key, GLint val);
 		/** @brief Compares the query result to the given target. */
