@@ -1,14 +1,12 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-#include <glbinding/gl/gl.h>
 #include <abstract.hpp>
 #include <algorithm>
 
 namespace Geometry {
-	using namespace gl;
 
-	template<typename S = GLfloat>
+	template<typename S = float>
 	struct Matrix_t;
 
 	template<typename S>
