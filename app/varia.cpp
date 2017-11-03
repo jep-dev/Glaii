@@ -20,7 +20,16 @@ template<typename... TN> struct Tags_t {
 	constexpr auto operator>>(Tags_t<SN...> const&) const
 		-> Tags_t<SN...,TN...> { return {}; }
 
+	template<typename S>
+	constexpr auto operator+(S const&) const {
+		return Tags_t<type, S>{};
+	}
 };
+template<template<typename...> class TT, typename... TN>
+auto operator*(Tag_tt<TT> const&, Tags_t<TN...> const&) {
+	return Tags_t<TT<TN>...>{};
+}
+
 template<typename... SN, typename... TN>
 constexpr auto tagAppend(Tags_t<SN...> const&,
 		Tags_t<TN...> const&) {
@@ -35,11 +44,13 @@ void apply(Tags_t<TN...> = {}) {
 int main(int argc, const char *argv[]) {
 	constexpr auto t0 = Tags_t<int> {};
 	constexpr auto t1 = Tags_t<char> {};
+	constexpr auto tt0 = Tag_tt<Tagged_tt> {};
 	apply(t0);
 	apply(t1);
 	apply(t0 >> t1);
 	apply(tagAppend(t0, t1));
-	constexpr auto tt0 = Tag_tt<Tagged_tt> {};
-	constexpr auto tt1 = decltype(tt0)::type {};
-	apply(Tags_t<Tag_tt<Tagged_tt>>{});
+	apply<Tags_t<Tag_tt<Tagged_tt>>>();
+	apply(t0 + t1);
+	apply(t0 + std::true_type {});
+	apply(Tag_tt<Tagged_tt>{}*(t0<<t1));
 }
