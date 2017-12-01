@@ -49,9 +49,64 @@ namespace View {
 			if(!call_handler(*this, ev)) return false;
 		return validate();
 	}
-	bool Window::draw(unsigned frame) {
+	bool Window::draw(unsigned frame, GLint id_mvp) {
 		static constexpr unsigned mspf60 = 100/6+1;
+		if(id_mvp == -1) return false;
 		if(!update(frame)) return false;
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		/* From app/release.cpp */
+		// TODO Move to src/model.cpp or sub
+		static unsigned w = 640, h = 480;
+		static auto asp = float(w)/h;
+		static float
+			x0 = -asp, y0 = -1, z0 =  1,
+			x1 =  asp, y1 =  1, z1 = 10,
+			m00 =    2*z0/(x1-x0), m02 = (x0+x1)/(x1-x0),
+			m11 =    2*z0/(y1-y0), m12 = (y0+y1)/(y1-y0),
+			m22 = (z0+z1)/(z0-z1), m23 = 2*z0*z1/(z0-z1),
+			mvp[] = {
+				m00,  0,   0,   0,
+				 0, m11,   0,   0,
+				 0,   0, m22, m23,
+				 0,   0,  -1,   0
+			}, vertices[] = {
+				-1,  -1,  -2,  +1,
+				+1,  -1,  -2,  +1,
+				+1,  +1,  -2,  +1,
+				-1,  +1,  -2,  +1
+			};
+
+		static unsigned indices[] = {
+			0, 1, 2, 0, 3, 2
+		};
+
+		/* From app/release.cpp */
+		// TODO Move to sub
+		static bool once = false;
+		static GLuint vbo = 0, vao = 0;
+		if(!once) {
+			once = true;
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
+
+			glGenBuffers(1, &vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof vertices,
+				vertices, GL_STATIC_DRAW);
+
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		}
+		glUniformMatrix4fv(id_mvp, 1, GL_FALSE, mvp);
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBindVertexArray(vao);
+		glDrawElements(GL_TRIANGLES, sizeof indices,
+			GL_UNSIGNED_INT, indices);
+		glDisableVertexAttribArray(0);
+
 		SDL_GL_SwapWindow(win);
 		SDL_Delay(mspf60);
 		return validate();
