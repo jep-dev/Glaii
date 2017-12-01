@@ -23,10 +23,11 @@ namespace View {
 		Abstract::Handler_t<Window>
 	{
 	protected:
-		SDL_Window *win;
-		Streams::ErrorFIFO errors;
-		SDL_GLContext ctx;
-		bool live;
+		SDL_Window *m_win;
+		Streams::ErrorFIFO m_errors;
+		SDL_GLContext m_ctx;
+		unsigned m_width, m_height;
+		bool m_live;
 	public:
 		operator bool(void) const;
 		operator SDL_Window *const(void) const;
