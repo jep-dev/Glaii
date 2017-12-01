@@ -41,7 +41,7 @@ namespace View {
 		bool handle(SDL_KeyboardEvent const& ev);
 
 		bool update(unsigned frame);
-		bool draw(unsigned frame);
+		bool draw(unsigned frame, GLint id_mvp);
 
 		Window(const char *title, int w, int h,
 			Uint32 flags, std::map<SDL_GLattr, int> const& attribs);
