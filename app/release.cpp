@@ -54,43 +54,12 @@ bool run(std::ostream &dest, int n_frames) {
 	if(id_mvp == -1)
 		return dest << "MVP uniform not found!", false;
 
-	float x0 = -asp, y0 = 1, z0 = -1,
-		  x1 = asp, y1 = 10, z1 = 1,
-		/* Using y as near/far axis; this retains handedness but makes
-		 * forward, right, and up axes positive in default orientation */
-		m00 = y0/x0, m11 = y0/y1, m2_ = y0-y1,
-		m22 = (y0+y1)/m2_, m23 = 2*y0*y1/m2_,
-		mvp[] = {
-			m00,  0,   0,   0,
-			 0,  m11,  0,   0,
-			 0,   0,  m22, m23,
-			 0,   0,  -1,   0
-		}, vertices[] = {
-			-1,  +5,  -1,  +1,
-			+1,  +5,  -1,  +1,
-			+1,  +5,  +1,  +1,
-			-1,  +5,  +1,  +1
-		};
-	unsigned indices[] = {0, 1, 2, 0, 2, 3};
-
-	GLuint vbo = 0, vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof vertices,
-		vertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
 	unsigned frame = 0;
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
 	endl(dest << "Frame" << right
 		<< setw(9) << setfill('.') << "FPS");
 	while(win) {
-		if(!win.draw(frame)) break;
+		if(!win.draw(frame, id_mvp)) break;
 		auto t1 = SDL_GetPerformanceCounter();
 		frame++;
 		if(!(frame & 15)) {
