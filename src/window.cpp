@@ -12,20 +12,20 @@ namespace View {
 	using namespace glbinding;
 
 	Window::operator bool(void) const {
-		return live && win && ctx && !errors;
+		return m_live && m_win && m_ctx && !m_errors;
 	}
 	Window::operator SDL_GLContext const(void) const {
-		return ctx;
+		return m_ctx;
 	}
 	Window::operator SDL_Window *const(void) const {
-		return win;
+		return m_win;
 	}
 	std::ostream& operator<<(std::ostream& dest, Window const& src) {
-		if(!(src.errors)) return dest;
-		return dest << "Window: " << src.errors;
+		if(!(src.m_errors)) return dest;
+		return dest << "Window: " << src.m_errors;
 	}
 	bool Window::validate(void) {
-		return live && (live &= !errors());
+		return m_live && (m_live &= !m_errors());
 	}
 	bool Window::handle(SDL_QuitEvent const& ev) {
 		return false;
@@ -33,6 +33,10 @@ namespace View {
 	bool Window::handle(SDL_WindowEvent const& ev) {
 		switch(ev.type) {
 			case SDL_WINDOWEVENT_CLOSE: return false;
+			case SDL_WINDOWEVENT_RESIZED: // TODO
+				m_width = ev.data1;
+				m_height = ev.data2;
+				break;
 			default: return true;
 		}
 	}
@@ -57,9 +61,8 @@ namespace View {
 
 		/* From app/release.cpp */
 		// TODO Move to src/model.cpp or sub
-		static unsigned w = 640, h = 480;
-		static auto asp = float(w)/h;
-		static float
+		auto asp = float(m_width)/m_height;
+		float
 			x0 = -asp, y0 = -1, z0 =  1,
 			x1 =  asp, y1 =  1, z1 = 10,
 			m00 =    2*z0/(x1-x0), m02 = (x0+x1)/(x1-x0),
@@ -93,7 +96,7 @@ namespace View {
 			glGenBuffers(1, &vbo);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glBufferData(GL_ARRAY_BUFFER, sizeof vertices,
-				vertices, GL_STATIC_DRAW);
+				vertices, GL_DYNAMIC_DRAW);
 
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -107,7 +110,7 @@ namespace View {
 			GL_UNSIGNED_INT, indices);
 		glDisableVertexAttribArray(0);
 
-		SDL_GL_SwapWindow(win);
+		SDL_GL_SwapWindow(m_win);
 		SDL_Delay(mspf60);
 		return validate();
 	}
@@ -115,51 +118,57 @@ namespace View {
 	Window::Window(const char *title, int w, int h,
 			Uint32 flags, std::map<SDL_GLattr, int> const& attribs) {
 		do {
-			if(errors()) {
-				errors.emplace_back("Window creation disabled.");
+			/* TODO (high) - reify errors, create handlers with policies
+			 * For example, GL version mismatch is almost certainly critical,
+			 * whereas bit depth, double buffering, etc. definitely aren't.
+			 * Reg. policies: use of fail bit implies that the object
+			 * cannot be used, but state is preserved until destruction,
+			 * as if it can be repaired or scrapped - but these require an
+			 * autopsy despite the fact that the flag was set due to a
+			 * known cause of death!
+			 */
+			if(m_errors()) {
+				m_errors.emplace_back("Window creation disabled.");
 				break;
 			}
 			int i = 0;
 			for(auto const& attr : attribs)
 				SDL_GL_SetAttribute(attr.first, attr.second);
-			win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+			m_win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED, w, h, flags | SDL_WINDOW_OPENGL
 				| SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
-			if(errors() || !win) {
-				errors.emplace_back("SDL window could not be created.");
+			if(m_errors() || !m_win) {
+				m_errors.emplace_back("SDL window could not be created.");
 				break;
 			}
-			ctx = SDL_GL_CreateContext(win);
-			if(errors() || !ctx) {
-				errors.emplace_back("SDL context could not be created.");
+			m_ctx = SDL_GL_CreateContext(m_win);
+			if(m_errors() || !m_ctx) {
+				m_errors.emplace_back("SDL context could not be created.");
 				break;
 			}
-			SDL_GL_MakeCurrent(win, ctx);
+			int l_width, l_height;
+			SDL_GetWindowSize(m_win, &l_width, &l_height);
+			m_width = l_width;
+			m_height = l_height;
+			SDL_GL_MakeCurrent(m_win, m_ctx);
 			Binding::initialize(false);
 			for(auto const& attr : attribs) {
 				i++;
 				SDL_GLattr k = attr.first;
 				int v0 = attr.second, v1 = v0;
 				SDL_GL_GetAttribute(k, &v1);
-				if(errors() || (v0 != v1)) {
+				if(m_errors() || (v0 != v1)) {
 					std::ostringstream oss;
 					oss << "Attribute #" << i << ": ["
 						<< k << "] = " << v1 << " != " << v0;
-					errors.emplace_back(oss.str());
+					m_errors.emplace_back(oss.str());
 					break;
 				}
 			}
-			/* TODO investigate unsupported swap interval, decide on
-			 * a policy for missing swap interval (heuristic delays?) */
-			/*if(!SDL_GL_SetSwapInterval(1)) {
-				errors();
-				errors.emplace_back("Swap interval / VSYNC not supported!");
-				break;
-			}*/
-			live = true;
+			m_live = true;
 			return;
 		} while(0);
-		live = false;
+		m_live = false;
 	}
 
 }
