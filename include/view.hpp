@@ -64,7 +64,7 @@ namespace View {
 		return fov(src, aspect)*ease + fov(dest, aspect)*(1-ease);
 	}
 	/**
- 	 * @brief The aspect ratio calculated by easing the given FOV's.
+	 * @brief The aspect ratio calculated by easing the given FOV's.
 	 * @tparam T The type of all parameters and the return value.
 	 */
 	template<typename T>
