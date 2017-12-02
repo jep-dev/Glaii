@@ -13,11 +13,13 @@ namespace Geometry {
 
 	template<typename> struct Quat_t;
 	template<typename> struct Vec_t;
+	template<typename> struct DualQuat_t;
 
 	/**
 	 * @brief Quaternion template with format i, j, k, real.
 	 * @tparam X The domain of each member.
 	 */
+	/*
 	template<typename X>
 	struct Quat_t {
 		X x, y, z, w;
@@ -68,7 +70,7 @@ namespace Geometry {
 		Quat_t<XR> operator/(R const& r) const {
 			return {x/r, y/r, z/r, w/r};
 		}
-	};
+	}; */
 
 	/**
 	 * @brief A 3D vector template, analogous to pure-imaginary quaternions.
@@ -109,7 +111,7 @@ namespace Geometry {
 	};
 
 	/**
- 	 * @brief The cross product of two (un-normalized) vector differences.
+	 * @brief The cross product of two (un-normalized) vector differences.
 	 * @tparam R The domain of the first vector
 	 * @tparam S The domain of the second vector, the shared origin
 	 * @tparam T The domain of the third vector
@@ -136,11 +138,12 @@ namespace Geometry {
 	 * @tparam LR The range of the resulting quaternion
 	 * @return The quaternion representation of the rotation
 	 */
-	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
+	/*template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> rotate(L const& l, Vec_t<R> const& r) {
 		LR l2 = LR(l)/2, lc = LR(cos(l2)), ls = LR(sin(l2));
 		return Quat_t<LR>{ls*r.x, ls*r.y, ls*r.z, lc};
 	}
+
 
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(Quat_t<L> const& l, Quat_t<R> const& r) {
@@ -151,6 +154,7 @@ namespace Geometry {
 			LR(l.w * r.w - l.x * r.x - l.y * r.y - l.z * r.z)
 		};
 	}
+	*/
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(Quat_t<L> const& l, Vec_t<R> const& r) {
 		return Quat_t<LR> {
@@ -160,6 +164,7 @@ namespace Geometry {
 			LR(          - l.x * r.x - l.y * r.y - l.z * r.z)
 		}**l;
 	}
+	/*
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(Quat_t<R> const& l, R const& r) {
 		return {LR(l.x*r), LR(l.y*r), LR(l.z*r), LR(l.w*r)};
@@ -167,7 +172,7 @@ namespace Geometry {
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(L const& l, Quat_t<R> const& r) {
 		return r*l;
-	}
+	}*/
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Vec_t<LR> operator*(Vec_t<L> const& l, Vec_t<R> const& r) {
 		return {LR(l.y * r.z - l.z * r.y),
@@ -222,10 +227,10 @@ namespace Geometry {
 		return nearZero((r-l).magnitude(), prox);
 	}
 
-	template struct Quat_t<float>;
+	// Macros if this starts to get tedious
 	template struct Vec_t<float>;
-	template struct Quat_t<double>;
 	template struct Vec_t<double>;
+
 }
 
 #endif
