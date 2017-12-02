@@ -26,9 +26,9 @@ namespace View {
 		SDL_Window *m_win;
 		Streams::ErrorFIFO m_errors;
 		SDL_GLContext m_ctx;
-		unsigned m_width, m_height;
 		bool m_live;
 	public:
+		unsigned m_width, m_height;
 		operator bool(void) const;
 		operator SDL_Window *const(void) const;
 		operator SDL_GLContext const(void) const;

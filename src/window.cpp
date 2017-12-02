@@ -31,13 +31,19 @@ namespace View {
 		return false;
 	}
 	bool Window::handle(SDL_WindowEvent const& ev) {
+		//m_width = 1; m_height = 1;
 		switch(ev.type) {
 			case SDL_WINDOWEVENT_CLOSE: return false;
-			case SDL_WINDOWEVENT_RESIZED: // TODO
+			case SDL_WINDOWEVENT_RESIZED: {
+				int p1 = 0, p2 = 0;
+				SDL_GetWindowSize(m_win, &p1, &p2);
+				if(!p1 || !p2) return false;
+				if(p1 != ev.data1 || p2 != ev.data2) return false;
 				m_width = ev.data1;
 				m_height = ev.data2;
+				glViewport(0, 0, m_width, m_height);
 				break;
-			default: return true;
+			} default: return true;
 		}
 	}
 	bool Window::handle(SDL_KeyboardEvent const& ev) {
@@ -59,20 +65,25 @@ namespace View {
 		if(!update(frame)) return false;
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		/* From app/release.cpp */
-		// TODO Move to src/model.cpp or sub
-		auto asp = float(m_width)/m_height;
-		float
-			x0 = -asp, y0 = -1, z0 =  1,
-			x1 =  asp, y1 =  1, z1 = 10,
-			m00 =    2*z0/(x1-x0), m02 = (x0+x1)/(x1-x0),
-			m11 =    2*z0/(y1-y0), m12 = (y0+y1)/(y1-y0),
-			m22 = (z0+z1)/(z0-z1), m23 = 2*z0*z1/(z0-z1),
+		int l_width = 0, l_height = 0;
+		SDL_GetWindowSize(m_win, &l_width, &l_height);
+		if(l_width <= 0 || l_height <= 0) return false;
+		glViewport(0, 0, l_width, l_height);
+		m_width = l_width;
+		m_height = l_height;
+
+		// FOVy is fixed; FOVx compensates for aspect ratio
+		float asp = float(m_width)/m_height,
+			x0 = -asp, x1 = asp, dx = x1-x0,
+			y0 =   -1, y1 =   1, dy = y1-y0,
+			z0 =    1, z1 =  10, dz = z0-z1,
+			mx =    2*z0/dx, my =    2*z0/dy, mz = (z0+z1)/dz,
+			ax = (x0+x1)/dx, ay = (y0+y1)/dy, tz = 2*z0*z1/dz,
 			mvp[] = {
-				m00,  0,   0,   0,
-				 0, m11,   0,   0,
-				 0,   0, m22, m23,
-				 0,   0,  -1,   0
+				mx,  0,  0,  0,
+				 0, my,  0,  0,
+				ax, ay, mz, -1,
+				 0,  0, tz,  0
 			}, vertices[] = {
 				-1,  -1,  -2,  +1,
 				+1,  -1,  -2,  +1,
@@ -103,6 +114,7 @@ namespace View {
 		}
 		glUniformMatrix4fv(id_mvp, 1, GL_FALSE, mvp);
 		glBindVertexArray(vao);
+
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		glBindVertexArray(vao);
