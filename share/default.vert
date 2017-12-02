@@ -5,5 +5,5 @@ uniform mat4 mvp;
 in vec4 arg0;
 
 void main(){
-	gl_Position = arg0 * mvp;
+	gl_Position = mvp * arg0;
 }
