@@ -7,7 +7,7 @@ doc_dir?=doc/
 doc_name?=Doxyfile
 doc_file?=$(doc_dir)$(doc_name)
 
-DOXY_BUILTIN_STL_SUPPORT?=YES
+# DOXY_BUILTIN_STL_SUPPORT?=YES
 DOXY_CALL_GRAPH?=YES
 DOXY_CALLER_GRAPH?=YES
 DOXY_COLS_IN_ALPHA_INDEX?=5
