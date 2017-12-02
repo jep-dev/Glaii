@@ -1,4 +1,6 @@
 #include "geometry.hpp"
+#include "quaternion.hpp"
+#include "dual_quaternion.hpp"
 #include "matrix.hpp"
 #include "streams.hpp"
 
