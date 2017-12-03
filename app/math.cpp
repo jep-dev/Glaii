@@ -88,13 +88,14 @@ OS& quaternions(OS& dest) {
 			paster << (i ? " " : "")
 				<< column(x[i], x[0]*x[i],
 					x[1]*x[i], x[2]*x[i], x[3]*x[i]);
-		dest << paster;
+		dest << "Quaternion multiplication table:\n"
+			<< paster << "\n\n";
 	}
 
 	{
 		Paster paster;
 		Vec_t<float> x = {1,0,0}, y = {0,1,0}, z = {0,0,1};
-		Quat_t<float> ident = {0,0,0,1};
+		Quat_t<float> ident = {1,0,0,0};
 		static_assert(is_same<
 				Quat_t<double>, decltype(rotate(M_PI, x))
 			>::value, "LCM(float, double) should be double");
@@ -109,8 +110,8 @@ OS& quaternions(OS& dest) {
 			>::value, "LCM(float(double), float) should be float");
 
 		float deg90 = M_PI/2;
-		const char *szAxes[] = {"e_i", "e_j", "e_k"},
-			*szRots[] = {"* e_i, ", "* e_j, ", "* e_k"};
+		const char *szAxes[] = {"i", "j", "k"},
+			*szRots[] = {"(i), ", "(j), ", "(k)"};
 		Quat_t<float> rotAxes[] =
 			{ rotate(deg90, x), rotate(deg90, y), rotate(deg90, z) };
 		paster.column("Axis", szAxes[0], szAxes[1], szAxes[2])
@@ -122,7 +123,37 @@ OS& quaternions(OS& dest) {
 			.column(szRots[1], rotAxes[0]*y, rotAxes[1]*y, rotAxes[2]*y)
 			.repeat(" ", 4)
 			.column(szRots[2], rotAxes[0]*z, rotAxes[1]*z, rotAxes[2]*z);
-		dest << paster;
+		dest << "Unit quaternions (rotations) applied to vectors:\n"
+			<< paster << "\n\n";
+	}
+	{
+		DualQuat_t<float> x[] = {
+			{1,0,0,0,0,0,0},
+			{0,1,0,0,0,0,0},
+			{0,0,1,0,0,0,0},
+			{0,0,0,1,0,0,0},
+			{0,0,0,0,1,0,0},
+			{0,0,0,0,0,1,0},
+			{0,0,0,0,0,0,1}
+		};
+		Paster paster;
+		OSS col;
+		paster.repeat("", 1, " | ", 7)
+			<< column("", x[0], x[1], x[2], x[3], x[4],
+				x[5], x[6]);
+		paster.repeat("", 1, " |  ", 7);
+		for(auto i = 0; i < 7; i++)
+			// Not the best example of paster - you have to
+			// unroll the loop since you're missing a way to
+			// print to one line without flushing the rest
+			paster << (i ? "  " : "")
+				<< column(x[i],
+					x[0]*x[i], x[1]*x[i], x[2]*x[i], x[3]*x[i],
+					x[4]*x[i], x[5]*x[i], x[6]*x[i]);
+		dest << "Dual quaternion multiplication table "
+			"(which has no pure \n  dual 'e' in this representation,"
+			" so all zeroes here\n  are saved operations.)\n"
+			<< paster << "\n\n";
 	}
 	return dest;
 }
