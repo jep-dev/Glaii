@@ -7,7 +7,9 @@
 namespace Geometry {
 	/* This would be a pair of quaternions, but the pure dual is never used
 	 * in representing scale, rotation, or translation, so 7 values are
-	 * used instead of 8. */
+	 * used instead of 8. Two rows of 4 and two diagonals of 3 are removed
+	 * from the product of dual quaternions, so 14 of 48 operations are
+	 * eliminated! */
 	template<typename X>
 	struct DualQuat_t {
 		X w = 0, x = 0, y = 0, z = 0, ex = 0, ey = 0, ez = 0;
