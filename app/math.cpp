@@ -128,32 +128,46 @@ OS& quaternions(OS& dest) {
 	}
 	{
 		DualQuat_t<float> x[] = {
-			{1,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0},
-			{0,0,1,0,0,0,0},
-			{0,0,0,1,0,0,0},
-			{0,0,0,0,1,0,0},
-			{0,0,0,0,0,1,0},
-			{0,0,0,0,0,0,1}
+			{1,0,0,0,0,0,0,0},
+			{0,1,0,0,0,0,0,0},
+			{0,0,1,0,0,0,0,0},
+			{0,0,0,1,0,0,0,0},
+			{0,0,0,0,1,0,0,0},
+			{0,0,0,0,0,1,0,0},
+			{0,0,0,0,0,0,1,0},
+			{0,0,0,0,0,0,0,1}
 		};
 		Paster paster;
 		OSS col;
-		paster.repeat("", 1, " | ", 7)
+		paster.repeat("", 1, " | ", 8)
 			<< column("", x[0], x[1], x[2], x[3], x[4],
 				x[5], x[6]);
-		paster.repeat("", 1, " |  ", 7);
-		for(auto i = 0; i < 7; i++)
+		paster.repeat("", 1, " |  ", 8);
+		for(auto i = 0; i < 8; i++)
 			// Not the best example of paster - you have to
 			// unroll the loop since you're missing a way to
 			// print to one line without flushing the rest
 			paster << (i ? "  " : "")
 				<< column(x[i],
 					x[0]*x[i], x[1]*x[i], x[2]*x[i], x[3]*x[i],
-					x[4]*x[i], x[5]*x[i], x[6]*x[i]);
+					x[4]*x[i], x[5]*x[i], x[6]*x[i], x[7]*x[i]);
 		dest << "Dual quaternion multiplication table "
 			"(which has no pure \n  dual 'e' in this representation,"
-			" so all zeroes here\n  are saved operations.)\n"
+			" so all zeroes here\n  are saved operations.)\n\n"
 			<< paster << "\n\n";
+
+		DualQuat_t<float> v = x[0]+x[5],
+			u = {float(cos(M_PI/4)), float(sin(M_PI/4)), 0, 0, 0, 0, 0},
+			u0 = u;
+
+		for(auto i = 5; i < 8; i++) {
+			v = x[0]+x[i];
+			for(auto j = 5; j < 8; j++) {
+				u = x[0]*float(cos(M_PI/4))+x[j]*float(sin(M_PI/4));
+				dest << "(" << u << ")(" << v << ")(" << *u << ") = "
+					<< u*v**u << "\n";
+			}
+		}
 	}
 	return dest;
 }

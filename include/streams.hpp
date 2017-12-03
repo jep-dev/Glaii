@@ -49,10 +49,12 @@ namespace Geometry {
 	template<typename S, typename T>
 	S& operator<<(S& dest, DualQuat_t<T> const& src) {
 		dest << std::showpos;
+
 		bool hit = false;
-		T x[] = {src.w, src.x, src.y, src.z, src.ex, src.ey, src.ez};
-		const char *l[] = {"", "i", "j", "k", "ei", "ej", "ek"};
-		for(unsigned i = 0; i < 7; i++) {
+		Quat_t<T> const& u = src.u, v = src.v;
+		T x[] = {u.w, u.x, u.y, u.z, v.w, v.x, v.y, v.z};
+		const char *l[] = {"", "i", "j", "k", "e", "ei", "ej", "ek"};
+		for(unsigned i = 0; i < 8; i++) {
 			auto ix = x[i];
 			if(nearZero(ix)) continue;
 			auto il = l[i];
