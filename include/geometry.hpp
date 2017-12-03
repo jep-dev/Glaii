@@ -154,7 +154,6 @@ namespace Geometry {
 			LR(l.w * r.w - l.x * r.x - l.y * r.y - l.z * r.z)
 		};
 	}
-	*/
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(Quat_t<L> const& l, Vec_t<R> const& r) {
 		return Quat_t<LR> {
@@ -164,7 +163,6 @@ namespace Geometry {
 			LR(          - l.x * r.x - l.y * r.y - l.z * r.z)
 		}**l;
 	}
-	/*
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
 	Quat_t<LR> operator*(Quat_t<R> const& l, R const& r) {
 		return {LR(l.x*r), LR(l.y*r), LR(l.z*r), LR(l.w*r)};
