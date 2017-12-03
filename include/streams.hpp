@@ -47,6 +47,26 @@ namespace Geometry {
 		return dest;
 	}
 	template<typename S, typename T>
+	S& operator<<(S& dest, DualQuat_t<T> const& src) {
+		dest << std::showpos;
+		bool hit = false;
+		T x[] = {src.w, src.x, src.y, src.z, src.ex, src.ey, src.ez};
+		const char *l[] = {"", "i", "j", "k", "ei", "ej", "ek"};
+		for(unsigned i = 0; i < 7; i++) {
+			auto ix = x[i];
+			if(nearZero(ix)) continue;
+			auto il = l[i];
+			hit = true;
+			auto ax = float(abs(ix));
+			if(i && nearZero(ax - 1))
+				dest << ((ix < 0) ? "-" : "+") << il;
+			else dest << ix << il;
+		}
+		if(!hit) dest << T(0);
+		dest << std::noshowpos;
+		return dest;
+	}
+	template<typename S, typename T>
 	S& operator<<(S& dest, Vec_t<T> const& src) {
 		Streams::Paster paster;
 		paster.column(roundNearZero(src.x), roundNearZero(src.y),
