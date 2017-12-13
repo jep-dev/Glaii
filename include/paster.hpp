@@ -2,43 +2,40 @@
 #define PASTER_HPP
 
 namespace Streams {
-
-	ostringstream repeat(ostringstream && dest) {
-		return std::move(dest);
+	template<typename... T> ostringstream
+	repeat(ostringstream && dest, T const&... tail)
+		{ return std::move(dest); }
+	template<typename H, typename HN, typename... T> ostringstream
+	repeat(H const& head, HN const& reps, T const&... tail)
+		{ return repeat(ostringstream(), head, reps, tail...); }
+	template<typename H, typename HN, typename... T> ostringstream
+	repeat(ostringstream && dest,
+			H const& head, HN const& reps, T const&... tail) {
+		for(auto i = 0; i < reps; i++) dest << head << '\n';
+		return repeat(std::move(dest), tail...);
 	}
-	template<typename T0, typename N = std::size_t, typename... TN>
-	ostringstream repeat(ostringstream && dest,
-			T0 const& t, N repeats, TN const&... tn) {
-		for(auto i = 0; i < repeats; i++)
-			dest << t << '\n';
-		return repeat(std::move(dest), tn...);
-	}
-	template<typename T0, typename... TN>
-	ostringstream repeat(ostringstream && dest,
-			T0 const& t, TN const&... tn) {
-		dest << t;
-		return repeat(std::move(dest), tn...);
-	}
-	template<typename T0, typename N = std::size_t, typename... TN>
-	ostringstream repeat(T0 const& t, N repeats, TN const&... tn) {
-		return repeat(ostringstream(), t, repeats, tn...);
+	// No newline?
+	template<typename H, typename... T> ostringstream
+	repeat(ostringstream && dest, H const& head, T const&... tail) {
+		dest << head;
+		return repeat(std::move(dest), tail...);
 	}
 
-	template<typename... TN>
-	ostringstream column(ostringstream && oss, TN const&... tn) {
-		return std::move(oss);
+	template<typename... T> ostringstream
+	column(ostringstream && oss, T const&... tail)
+		{ return std::move(oss); }
+	template<typename... T> ostringstream
+	column(T const&... tail) {
+		return column(std::move(ostringstream()), tail...);
+		/*ostringstream oss;
+		return column(std::move(oss), tn...);*/
 	}
-	template<typename T0, typename... TN>
-	ostringstream column(ostringstream && oss,
-			T0 const& t0, TN const&... tn) {
-		oss << t0 << '\n';
-		return column(std::move(oss), tn...);
+	template<typename H, typename... T> ostringstream
+	column(ostringstream && oss, H const& head, T const&... tail) {
+		oss << head << '\n';
+		return column(std::move(oss), tail...);
 	}
-	template<typename... TN>
-	ostringstream column(TN const&... tn) {
-		ostringstream oss;
-		return column(std::move(oss), tn...);
-	}
+
 	struct Paster {
 	protected:
 		std::vector<string> data;
@@ -79,6 +76,7 @@ namespace Streams {
 		Paster& flush(size_t toCol = 0, size_t toRow = 0);
 		Paster& operator<<(string const& rhs);
 		Paster& operator<<(ostringstream const& rhs);
+		// TODO DRY!
 		template<typename... T>
 		Paster& column(T const&... t) {
 			ostringstream oss;
@@ -143,26 +141,27 @@ namespace Streams {
 			bool n = true, bool e = true,
 			bool s = true, bool w = true) {
 		Paster p = src;
+		ostringstream padder;
 		if(!p.flushed()) p.flush();
 		unsigned width = p[0].size(), height = p.size();
 		auto filler = string(width, '-');
 		if(n) {
-			if(w) dest << '.';
+			if(w) dest << ".-";
 			dest << filler;
-			if(e) dest << '.';
+			if(e) dest << "-.";
 			dest << '\n';
 		}
 		for(unsigned i = 0; i < height; i++) {
-			if(w) dest << '|';
+			if(w) dest << "| ";
 			dest << p[i];
-			if(e) dest << '|';
+			if(e) dest << " |";
 			dest << '\n';
 		}
 		if(s) {
-			if(w) dest << '\'';
+			if(w) dest << "'-";
 			dest << filler;
-			if(e) dest << '\'';
-			dest << "\n";
+			if(e) dest << "-'";
+			dest << '\n';
 		}
 		return dest;
 	}
