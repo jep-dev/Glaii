@@ -83,7 +83,7 @@ namespace Geometry {
 			if(i) paster << ' ';
 			paster.column(roundNearZero(m[i]),
 				roundNearZero(m[i+4]), roundNearZero(m[i+8]),
-				roundNearZero(m[i+12])); // << " "; // << (i ? " " : "");
+				roundNearZero(m[i+12]));
 		}
 		dest << paster;
 		return dest;
