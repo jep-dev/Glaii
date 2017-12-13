@@ -1,3 +1,4 @@
+
 #include "geometry.hpp"
 #include "quaternion.hpp"
 #include "dual_quaternion.hpp"
@@ -16,15 +17,17 @@ using std::endl;
 using std::setw;
 using std::setfill;
 using std::setprecision;
-using OS = std::ostream;
-using OSS = std::ostringstream;
+using std::ostream;
+using std::ostringstream;
+
+using std::is_same;
 
 using namespace Geometry;
+using Streams::Paster;
+using Streams::column;
+using Streams::repeat;
 
-OS& matrices(OS& dest) {
-	using std::is_same;
-	using Streams::Paster;
-	using Streams::column;
+ostream& matrices(ostream& dest) {
 	auto theta = M_PI/2;
 	float fcos = float(cos(theta)), fsin = float(sin(theta));
 	auto mat0 = Matrix_t<decltype(theta)>::identity();
@@ -34,145 +37,150 @@ OS& matrices(OS& dest) {
 		   0,    0, 1, 0,
 		   0,    0, 0, 1
 	}, mat2 = {
-		fcos, 0,-fsin, 0,
-		   0, 1,    0, 0,
-		fsin, 0, fcos, 0,
-		   0, 0,    0, 1
+		1,    0,     0, 0,
+		0, fcos, -fsin, 0,
+		0, fsin,  fcos, 0,
+		0,    0,     0, 1
 	};
+	ostringstream oss1;
+	oss1 << mat1;
 	auto mat01 = mat0 * mat1;
 	auto mat12 = mat1 * mat2;
 
-	static_assert(is_same<decltype(mat01), decltype(mat0)>::value,
-		"LCM(double, float) should be double");
-
-	OSS oss1;
-	oss1 << mat1;
+	dest << "Example of matrix product...\n";
 	{
 		Paster paster;
-		OSS oss2, oss12;
+		ostringstream oss2, oss12;
 		oss2 << mat2;
 		oss12 << mat12;
-		paster << oss1 << "\n * " << oss2 << "\n = " << oss12;
-		dest << paster;
+		paster << " " << oss1 << "\n * " << oss2
+			<< "\n = " << oss12 << " ";
+		border(dest,paster) << "\n";
 	}
-	endl(dest);
+	dest << "... and transpose\n";
 	{
 		Paster paster;
-		OSS oss2;
+		ostringstream oss2;
 		oss2 << mat1.transpose();
 		paster << oss1 << " T\n  = " << oss2;
-		dest << paster;
+		border(dest, paster) << "\n\n";
 	}
-	endl(dest);
+	dest << "\n\n";
 	return dest;
 }
 
-OS& quaternions(OS& dest) {
-	using Streams::Paster;
-	using Streams::column;
-	using std::is_same;
-	{
-		Quat_t<float> x[] = {
-			{1,0,0,0},
-			{0,1,0,0},
-			{0,0,1,0},
-			{0,0,0,1}
-		};
-
-		Paster paster;
-		OSS col;
-		paster.repeat("", 1, "| ", 4)
-			<< column("", x[0], x[1], x[2], x[3]);
-		paster.repeat("", 1, " | ", 4);
-		for(auto i = 0; i < 4; i++)
-			paster << (i ? " " : "")
-				<< column(x[i], x[0]*x[i],
-					x[1]*x[i], x[2]*x[i], x[3]*x[i]);
-		dest << "Quaternion multiplication table:\n"
-			<< paster << "\n\n";
-	}
-
+ostream& quaternions(ostream& dest) {
+	std::vector<Quatf> basis = {1._r, 1._i, 1._j, 1._k};
 	{
 		Paster paster;
-		Vec_t<float> x = {1,0,0}, y = {0,1,0}, z = {0,0,1};
-		Quat_t<float> ident = {1,0,0,0};
-		static_assert(is_same<
-				Quat_t<double>, decltype(rotate(M_PI, x))
-			>::value, "LCM(float, double) should be double");
-		static_assert(is_same<
-				decltype(rotate(M_PI, x)), Quat_t<double>
-			>::value, "LCM(double, float) should be double");
-		static_assert(is_same<
-				decltype(rotate<float>(M_PI, x)), Quat_t<float>
-			>::value, "LCM(float, float) should be float");
-		static_assert(is_same<
-				decltype(rotate(float(M_PI), x)), Quat_t<float>
-			>::value, "LCM(float(double), float) should be float");
-
-		float deg90 = M_PI/2;
-		const char *szAxes[] = {"i", "j", "k"},
-			*szRots[] = {"(i), ", "(j), ", "(k)"};
-		Quat_t<float> rotAxes[] =
-			{ rotate(deg90, x), rotate(deg90, y), rotate(deg90, z) };
-		paster.column("Axis", szAxes[0], szAxes[1], szAxes[2])
-			.repeat("", 1, " -> ", 3)
-			.column("1/4 turn", rotAxes[0], rotAxes[1], rotAxes[2])
-			.repeat(" ", 4)
-			.column(szRots[0], rotAxes[0]*x, rotAxes[1]*x, rotAxes[2]*x)
-			.repeat(" ", 4)
-			.column(szRots[1], rotAxes[0]*y, rotAxes[1]*y, rotAxes[2]*y)
-			.repeat(" ", 4)
-			.column(szRots[2], rotAxes[0]*z, rotAxes[1]*z, rotAxes[2]*z);
-		dest << "Unit quaternions (rotations) applied to vectors:\n"
-			<< paster << "\n\n";
-	}
-	{
-		DualQuat_t<float> x[] = {
-			{1,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0},
-			{0,0,1,0,0,0,0,0},
-			{0,0,0,1,0,0,0,0},
-			{0,0,0,0,1,0,0,0},
-			{0,0,0,0,0,1,0,0},
-			{0,0,0,0,0,0,1,0},
-			{0,0,0,0,0,0,0,1}
-		};
-		Paster paster;
-		OSS col;
-		paster.repeat("", 1, " | ", 8)
-			<< column("", x[0], x[1], x[2], x[3], x[4],
-				x[5], x[6]);
-		paster.repeat("", 1, " |  ", 8);
-		for(auto i = 0; i < 8; i++)
-			// Not the best example of paster - you have to
-			// unroll the loop since you're missing a way to
-			// print to one line without flushing the rest
-			paster << (i ? "  " : "")
-				<< column(x[i],
-					x[0]*x[i], x[1]*x[i], x[2]*x[i], x[3]*x[i],
-					x[4]*x[i], x[5]*x[i], x[6]*x[i], x[7]*x[i]);
-		dest << "Dual quaternion multiplication table "
-			"(which has no pure \n  dual 'e' in this representation,"
-			" so all zeroes here\n  are saved operations.)\n\n"
-			<< paster << "\n\n";
-
-		DualQuat_t<float> v = x[0]+x[5],
-			u = {float(cos(M_PI/4)), float(sin(M_PI/4)), 0, 0, 0, 0, 0},
-			u0 = u;
-
-		for(auto i = 5; i < 8; i++) {
-			v = x[0]+x[i];
-			for(auto j = 5; j < 8; j++) {
-				u = x[0]*float(cos(M_PI/4))+x[j]*float(sin(M_PI/4));
-				dest << "(" << u << ")(" << v << ")(" << *u << ") = "
-					<< u*v**u << "\n";
-			}
+		for(auto const& y : basis) {
+			ostringstream col;
+			for(auto const& x : basis)
+				col << ' ' << x*y << " \n";
+			paster << col;
 		}
+		dest << "Quaternion product:\n";
+		ostringstream out;
+		border(out, paster);
+		dest << out.str() << "\n\n";
+	} {
+		Vec_t<float> x = {1,0,0}, y = {0,1,0}, z = {0,0,1};
+
+		static_assert(is_same<Quat_t<double>,
+			decltype(rotation(M_PI, x))>::value,
+			"The double-precision field is copied by the quaternion");
+		static_assert(is_same<decltype(rotation<float>(M_PI, x)),
+			Quat_t<float>>::value, "The quaternion distributes the loss "
+			"of precision to its elements");
+		static_assert(is_same<decltype(rotation(float(M_PI), x)),
+			Quat_t<float>>::value, "Equivalently, the loss of precision "
+			"is copied by the quaternion");
+
+		Paster paster;
+		float deg90 = M_PI/2;
+		auto x90 = rotation(deg90, x),
+			 y90 = rotation(deg90, y),
+			 z90 = rotation(deg90, z);
+		ostringstream header;
+		header << "Rotation\n";
+		for(auto rot : {x90, y90, z90})
+			header << rot << "\n";
+
+		auto bar = repeat(" | ", 4);
+		paster << bar << header << bar;
+		for(auto const& point : basis) {
+			ostringstream col;
+			col << "^(" << point << ")\n";
+			for(auto rot : {x90, y90, z90})
+				col << (rot ^ point) << "\n";
+			paster << col << bar;
+		}
+		dest << paster << "\n\n";
+	}
+	return dest;
+}
+
+ostream& dual_quaternions(ostream& dest) {
+	{
+		auto z = 0._r, r = 1._r,
+			 i = 1._i, j = 1._j, k = 1._k;
+		std::vector<DualQuat_t<float>> basis {
+			{r, z}, {i, z}, {j, z}, {k, z},
+			{z, r}, {z, i}, {z, j}, {z, k}
+		};
+		{
+			Paster paster;
+			for(auto j = 0; j < 8; j++) {
+				ostringstream col;
+				for(auto i = 0; i < 8; i++) {
+					col << " " << basis[i]*basis[j] << " \n";
+				}
+				paster << col;
+			}
+
+			dest << "Dual quaternion product:\n";
+			border(dest, paster) << "\n\n";
+		}
+		{
+			Paster paster;
+			DualQuat_t<float> rot = {rotation<float>(M_PI,
+				Vec_t<float>{0,0,1}), 0._r}, trans = {1._r, 1._k},
+				transrot = trans*rot, rottrans = rot*trans,
+				screw = rot+trans;
+			std::vector<DualQuat_t<float>>
+				xforms = {rot, trans, rottrans, transrot, screw},
+				xformed = { {r,i}, {r,j}, {r,k} };
+			{
+				ostringstream col;
+				col << "Transform\n";
+				for(auto const& xf : xforms)
+					col << xf << "\n";
+				paster << col;
+			}
+			auto bar = repeat("", 1, " | ", xforms.size());
+			for(auto const& xfd : xformed) {
+				ostringstream col;
+				col << "^(" << xfd << ")\n";
+				for(auto const& xf : xforms) {
+					col << (xf ^ xfd) << "\n";
+				}
+				paster << bar << col << " ";
+			}
+			border(dest, paster) << "\n\n";
+		}
+
+		/*for(auto i = 5; i < 8; i++) {
+			v = basis[i];
+			u = {rotation(float(M_PI/2), Vec_t<float>{1,0,0}), {0}};
+			dest << "u = " << u << "; v = " << v
+					<< "; u^v = " << (u^v) << "\n";
+		}*/
 	}
 	return dest;
 }
 
 int main(int argc, const char *argv[]) {
-	quaternions(cout) << endl;
 	matrices(cout) << endl;
+	quaternions(cout) << endl;
+	dual_quaternions(cout) << endl;
 }
