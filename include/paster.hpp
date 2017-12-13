@@ -27,8 +27,6 @@ namespace Streams {
 	template<typename... T> ostringstream
 	column(T const&... tail) {
 		return column(std::move(ostringstream()), tail...);
-		/*ostringstream oss;
-		return column(std::move(oss), tn...);*/
 	}
 	template<typename H, typename... T> ostringstream
 	column(ostringstream && oss, H const& head, T const&... tail) {
@@ -76,36 +74,18 @@ namespace Streams {
 		Paster& flush(size_t toCol = 0, size_t toRow = 0);
 		Paster& operator<<(string const& rhs);
 		Paster& operator<<(ostringstream const& rhs);
-		// TODO DRY!
-		template<typename... T>
-		Paster& column(T const&... t) {
-			ostringstream oss;
-			if(pos) oss << std::showpos;
-			return column(oss, t...);
+
+		template<typename... H, typename... T>
+		Paster& column(H &... h, T const&... tail) {
+			return *this << column(h..., tail...);
 		}
-		template<typename T0, typename... TN>
-		Paster& column(ostringstream& oss, T0 const& t0, TN const&... tn) {
-			oss << t0 << '\n';
-			return column(oss, tn...);
+		template<typename... H, typename... T>
+		Paster& repeat(H &... h, T const&... tail) {
+			return *this << repeat(h..., tail...);
 		}
-		template<typename... TN>
-		Paster& column(ostringstream& oss, TN const&... tn) {
-			return *this << oss;
-		}
-		template<typename T0, typename N = std::size_t, typename... TN>
-		Paster& repeat(T0 const& t, N repeats, TN const&... tn) {
-			ostringstream oss;
-			if(pos) oss << std::showpos;
-			return repeat(oss, t, repeats, tn...);
-		}
-		template<typename T0, typename N = std::size_t, typename... TN>
-		Paster& repeat(ostringstream& dest,
-				T0 const& t, N repeats, TN const&... tn) {
-			for(auto i = 0; i < repeats; i++)
-				dest << t << '\n';
-			return repeat(dest, tn...);
-		}
-		Paster& repeat(ostringstream& dest);
+		Paster& column(ostringstream &);
+		Paster& repeat(ostringstream &);
+
 		template<typename T>
 		Paster& center(T const& t) {
 			ostringstream oss;
@@ -146,22 +126,25 @@ namespace Streams {
 		unsigned width = p[0].size(), height = p.size();
 		auto filler = string(width, '-');
 		if(n) {
-			if(w) dest << ".-";
+			dest << (w ? ".-" : "") << filler << (e ? "-." : "") << '\n';
+			/*if(w) dest << ".-";
 			dest << filler;
 			if(e) dest << "-.";
-			dest << '\n';
+			dest << '\n';*/
 		}
 		for(unsigned i = 0; i < height; i++) {
-			if(w) dest << "| ";
+			dest << (w ? "| " : "") << p[i] << (e ? " |" : "") << '\n';
+			/*if(w) dest << "| ";
 			dest << p[i];
 			if(e) dest << " |";
-			dest << '\n';
+			dest << '\n';*/
 		}
 		if(s) {
-			if(w) dest << "'-";
+			dest << (w ? "'-" : "") << filler << (e ? "-'" : "") << '\n';
+			/*if(w) dest << "'-";
 			dest << filler;
 			if(e) dest << "-'";
-			dest << '\n';
+			dest << '\n';*/
 		}
 		return dest;
 	}
