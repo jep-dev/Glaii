@@ -43,77 +43,33 @@ namespace Geometry {
 		friend Unit operator"" _j();
 		friend Unit operator"" _k();
 
-		X operator[](unsigned i) const {
-			return (i==0) ? w : (i==1) ? x : (i==2) ? y : (i==3) ? z : X(0);
-		}
-		X operator[](char c) const {
-			return c == '1' ? w : c == 'i' ? x : c == 'j'
-				? y : c == 'k' ? z : 0;
-		}
+		X operator[](unsigned i) const;
+		X operator[](char c) const;
 		template<typename R>
-		Quat_t<X> operator=(Quat_t<R> const& r) {
-			w = X(r.w); x = X(r.x);
-			y = X(r.y); z = X(r.z);
-			return *this;
-		}
-		Quat_t<X> operator*(void) const {
-			return {w, -x, -y, -z};
-		}
-		Quat_t<X> operator-(void) const {
-			return {-w, -x, -y, -z};
-		}
-		X magnitude2(void) const {
-			return w*w + x*x + y*y + z*z;
-		}
-		X magnitude(void) const {
-			return X(sqrt(magnitude2()));
-		}
-		Quat_t<X> normalize(void) const {
-			return *this / magnitude();
-		}
+		Quat_t<X> operator=(Quat_t<R> const& r);
+		Quat_t<X> operator*(void) const;
+		Quat_t<X> operator-(void) const;
+		/*X magnitude2(void) const;
+		X magnitude(void) const;
+		Quat_t<X> normalize(void) const;*/
 		template<typename R, typename XR = COMBINE(X,*,R)>
-		Quat_t<XR> operator*(Quat_t<R> const& r) const {
-			return {
-				XR(w * r.w - x * r.x - y * r.y - z * r.z),
-				XR(w * r.x + x * r.w + y * r.z - z * r.y),
-				XR(w * r.y - x * r.z + y * r.w + z * r.x),
-				XR(w * r.z + x * r.y - y * r.x + z * r.w)
-			};
-		}
+		Quat_t<XR> operator*(Quat_t<R> const& r) const;
 		/**
 		 * @brief The 'conjugacy' or 'sandwich product', A^B := ABA*.
 		 * TODO: profiling; inlining? (C=AB, D=CA* vs. D=ABA*)
 		 */
 		template<typename R, typename XR = COMBINE(X,*,R)>
-		Quat_t<XR> operator^(Vec_t<R> const& r) const {
-			return Quat_t<XR> {
-				XR(          - x * r.x - y * r.y - z * r.z),
-				XR(w * r.x             + y * r.z - z * r.y),
-				XR(w * r.y - x * r.z             + z * r.x),
-				XR(w * r.z + x * r.y - y * r.x            )
-			}***this;
-		}
+		Quat_t<XR> operator^(Vec_t<R> const& r) const;
 		template<typename R, typename XR = COMBINE(X,*,R)>
-		Quat_t<XR> operator^(Quat_t<R> const& r) const {
-			return *this * r * * *this;
-		}
+		Quat_t<XR> operator^(Quat_t<R> const& r) const;
 		template<typename R, typename XR = COMBINE(X,+,R)>
-		Quat_t<XR> operator+(Quat_t<R> const& r) const {
-			return {XR(w+r.w), XR(x+r.x), XR(y+r.y), XR(z+r.z)};
-		}
+		Quat_t<XR> operator+(Quat_t<R> const& r) const;
 		template<typename R, typename XR = COMBINE(X,-,R)>
-		Quat_t<XR> operator-(Quat_t<R> const& r) const {
-			return {XR(w-r.w), XR(x-r.x), XR(y-r.y), XR(z-r.z)};
-		}
+		Quat_t<XR> operator-(Quat_t<R> const& r) const;
 		template<typename R>
-		bool operator==(Quat_t<R> const& r) const {
-			return w == r.w && x == r.x
-				&& y == r.y && z == r.z;
-		}
+		bool operator==(Quat_t<R> const& r) const;
 		template<typename R, typename XR = COMBINE(X,/,R)>
-		Quat_t<XR> operator/(R const& r) const {
-			return {w/r, x/r, y/r, z/r};
-		}
+		Quat_t<XR> operator/(R const& r) const;
 	};
 
 	/**
@@ -155,5 +111,6 @@ namespace Geometry {
 	}
 
 }
+#include "quaternion.tpp"
 
 #endif
