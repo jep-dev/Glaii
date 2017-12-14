@@ -3,8 +3,8 @@
 include Makefile.conf
 
 VARS_SRC:=APP SRC
-VARS_INC:=APP INC
-VARS_IN:=$(VARS_SRC) INC
+VARS_INC:=APP INC IMP
+VARS_IN:=$(VARS_SRC) INC IMP
 VARS_OBJ:=OBJ LIB
 VARS_OUT:=DEP $(VARS_OBJ) BIN
 
@@ -12,6 +12,7 @@ VARS_OUT:=DEP $(VARS_OBJ) BIN
 ROOT_APP?=app/
 ROOT_SRC?=src/
 ROOT_INC?=include/
+ROOT_IMP?=include/
 # Output destinations
 DEST_DIR?=
 ROOT_OBJ?=$(DEST_DIR)obj/
@@ -20,6 +21,7 @@ ROOT_LIB?=$(DEST_DIR)lib/
 ROOT_BIN?=$(DEST_DIR)bin/
 ROOTS_SRC:=$(foreach X,$(VARS_SRC),$(ROOT_$(X)))
 ROOTS_INC:=$(foreach X,$(VARS_INC),$(ROOT_$(X)))
+ROOTS_IMP:=$(foreach X,$(VARS_IMP),$(ROOT_$(X)))
 ROOTS_OBJ:=$(foreach X,$(VARS_OBJ),$(ROOT_$(X)))
 
 define TO_NAME =
@@ -42,6 +44,9 @@ endef
 define TO_INC =
 $(call TO_FILE,$(call TO_NAME,$(1)),INC,,.hpp)
 endef
+define TO_IMP =
+$(call TO_FILE,$(call TO_NAME,$(!)),IMP,,.tpp)
+endef
 define TO_DEP =
 $(call TO_FILE,$(call TO_NAME,$(1)),DEP,,.d)
 endef
@@ -60,6 +65,7 @@ endef
 
 # Ordered discovery generation
 $(foreach X,$(VARS_INC),$(eval vpath %.hpp $(ROOT_$(X))))
+$(foreach X,$(VARS_IMP),$(eval vpath %.tpp $(ROOT_$(X))))
 $(foreach X,$(VARS_SRC),$(eval vpath %.cpp $(ROOT_$(X))))
 SPACE:=$(subst , ,)
 RPATH:=-Wl,-rpath,$(subst $(SPACE),:,$(ROOTS_OBJ))
@@ -91,7 +97,7 @@ $(foreach N,$(NAMES_BIN),\
 $(foreach N,$(NAMES_LIB),\
 	$(eval $(call TO_DEP,$(N)):)\
 	$(eval $(call TO_OBJ,$(N)): $(call TO_SRC,$(N)))\
-	$(eval $(call TO_OBJ,$(N)): $(call TO_FILES,$(N),SRC INC DEP);\
+	$(eval $(call TO_OBJ,$(N)): $(call TO_FILES,$(N),SRC INC IMP DEP);\
 	$(CXX) -MT $$@ -MMD -MP -MF $(call TO_TDEP,$(N)) \
 		$(CXXFLAGS) -fPIC -c $$< -o $$@ \
 	&& mv $(call TO_FILES,$(N),TDEP DEP) && touch $$@)\
