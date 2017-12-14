@@ -2,5 +2,4 @@
 #include "quaternion.hpp"
 
 namespace Geometry {
-	//
 }
