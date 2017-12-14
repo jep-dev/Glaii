@@ -18,8 +18,34 @@ namespace Streams {
 	using std::basic_streambuf;
 	using std::ostringstream;
 
+	template<typename S, typename... T>
+	S repeat(S && dest, T const&... tail) {
+		return std::move(dest);
+	}
+	template<typename S, typename H, typename HN, typename... T>
+	S repeat(S && dest, H const& head, HN const& reps, T const&... tail) {
+		for(auto i = 0; i < reps; i++) dest << head << '\n';
+		return repeat(std::move(dest), tail...);
+	}
+	template<typename S, typename H, typename... T>
+	S repeat(S && dest, H const& head, T const&... tail) {
+		dest << head;
+		return repeat(std::move(dest), tail...);
+	}
+
+	template<typename S, typename... T>
+	S column(S && dest, T const&... tail) {
+		return std::move(dest);
+	}
+	template<typename S, typename H, typename... T>
+	S column(S && dest, H const& head, T const&... tail) {
+		dest << head << '\n';
+		return column(std::move(dest), tail...);
+	}
+
 	struct Cutter;
 	struct Paster;
+
 }
 
 #include "cutter.hpp"
@@ -70,10 +96,16 @@ namespace Geometry {
 	}
 	template<typename S, typename T>
 	S& operator<<(S& dest, Vec_t<T> const& src) {
-		Streams::Paster paster;
-		paster.column(roundNearZero(src.x), roundNearZero(src.y),
-				roundNearZero(src.z)).column('i','j','k');
-		dest << paster;
+		//Streams::Paster paster;
+		using Streams::column;
+		using std::ostringstream;
+		ostringstream oss;
+		oss << std::showpos;
+		dest << (Streams::Paster() << column(std::move(oss),
+				roundNearZero(src.x), roundNearZero(src.y),
+				roundNearZero(src.z))
+			<< column(ostringstream(), 'i','j','k'));
+		//dest << paster;
 		return dest;
 	}
 	template<typename S, typename T>
@@ -81,9 +113,11 @@ namespace Geometry {
 		Streams::Paster paster;
 		for(auto i = 0; i < 4; i++) {
 			if(i) paster << ' ';
-			paster.column(roundNearZero(m[i]),
-				roundNearZero(m[i+4]), roundNearZero(m[i+8]),
-				roundNearZero(m[i+12]));
+			std::ostringstream oss;
+			oss << std::showpos;
+			paster << Streams::column(std::move(oss),
+				roundNearZero(m[i]), roundNearZero(m[i+4]),
+				roundNearZero(m[i+8]), roundNearZero(m[i+12]));
 		}
 		dest << paster;
 		return dest;

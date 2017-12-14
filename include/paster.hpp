@@ -2,37 +2,6 @@
 #define PASTER_HPP
 
 namespace Streams {
-	template<typename... T> ostringstream
-	repeat(ostringstream && dest, T const&... tail)
-		{ return std::move(dest); }
-	template<typename H, typename HN, typename... T> ostringstream
-	repeat(H const& head, HN const& reps, T const&... tail)
-		{ return repeat(ostringstream(), head, reps, tail...); }
-	template<typename H, typename HN, typename... T> ostringstream
-	repeat(ostringstream && dest,
-			H const& head, HN const& reps, T const&... tail) {
-		for(auto i = 0; i < reps; i++) dest << head << '\n';
-		return repeat(std::move(dest), tail...);
-	}
-	// No newline?
-	template<typename H, typename... T> ostringstream
-	repeat(ostringstream && dest, H const& head, T const&... tail) {
-		dest << head;
-		return repeat(std::move(dest), tail...);
-	}
-
-	template<typename... T> ostringstream
-	column(ostringstream && oss, T const&... tail)
-		{ return std::move(oss); }
-	template<typename... T> ostringstream
-	column(T const&... tail) {
-		return column(std::move(ostringstream()), tail...);
-	}
-	template<typename H, typename... T> ostringstream
-	column(ostringstream && oss, H const& head, T const&... tail) {
-		oss << head << '\n';
-		return column(std::move(oss), tail...);
-	}
 
 	struct Paster {
 	protected:
@@ -74,17 +43,6 @@ namespace Streams {
 		Paster& flush(size_t toCol = 0, size_t toRow = 0);
 		Paster& operator<<(string const& rhs);
 		Paster& operator<<(ostringstream const& rhs);
-
-		template<typename... H, typename... T>
-		Paster& column(H &... h, T const&... tail) {
-			return *this << column(h..., tail...);
-		}
-		template<typename... H, typename... T>
-		Paster& repeat(H &... h, T const&... tail) {
-			return *this << repeat(h..., tail...);
-		}
-		Paster& column(ostringstream &);
-		Paster& repeat(ostringstream &);
 
 		template<typename T>
 		Paster& center(T const& t) {

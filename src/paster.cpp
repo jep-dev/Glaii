@@ -38,7 +38,4 @@ namespace Streams {
 		Paster& Paster::operator<<(ostringstream const& rhs) {
 			return (*this) << rhs.str();
 		}
-		Paster& Paster::repeat(ostringstream& dest) {
-			return *this << dest;
-		}
 }
