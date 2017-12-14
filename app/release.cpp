@@ -21,8 +21,10 @@
 #define GLSL_FRAG GLSL_ROOT "default.frag"
 #endif
 
-#ifndef CTX
-#define CTX(X) SDL_GL_CONTEXT_ ## X
+/* TODO Remove convenience macro? GL prefix is more descriptive but
+ * doesn't match GL_[constant] or GL[type] conventions */
+#ifndef GLCTX
+#define GLCTX(X) SDL_GL_CONTEXT_ ## X
 #endif
 
 bool run(std::ostream &dest, int n_frames) {
@@ -32,17 +34,19 @@ bool run(std::ostream &dest, int n_frames) {
 	using std::right;
 	using std::setw;
 	using std::setfill;
+	using std::flush;
+	using std::endl;
+	using std::setprecision;
 
 	unsigned w = 640, h = 480;
-	auto asp = float(w)/h; // TODO test aspect easing from view.hpp
+	auto asp = float(w)/h;
 	Window win("Title", w, h, SDL_WINDOW_RESIZABLE, {
-		{CTX(PROFILE_MASK), CTX(PROFILE_CORE)},
-		{CTX(MAJOR_VERSION), 3}, {CTX(MINOR_VERSION), 3},
+		{GLCTX(PROFILE_MASK), GLCTX(PROFILE_CORE)},
+		{GLCTX(MAJOR_VERSION), 3}, {GLCTX(MINOR_VERSION), 3},
 		{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}
 	});
 	if(!win) return dest << win, false;
 
-	// TODO Reduce to Program<GLenum...>(path...)
 	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
 	if(!p.build())
@@ -54,21 +58,29 @@ bool run(std::ostream &dest, int n_frames) {
 	if(id_mvp == -1)
 		return dest << "MVP uniform not found!", false;
 
-	unsigned frame = 0;
+	unsigned frame = 0, window = 30;
+	float rollsum = 0, store[window] = {0};
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
-	endl(dest << "Frame" << right
-		<< setw(9) << setfill('.') << "FPS");
+	endl(dest << "FPS during " << window << " frames:");
+	dest << setprecision(5);
 	while(win) {
 		if(!win.draw(frame, id_mvp)) break;
 		auto t1 = SDL_GetPerformanceCounter();
-		frame++;
-		if(!(frame & 15)) {
-			auto freq = SDL_GetPerformanceFrequency();
-			auto fps = float(freq)/(t1-t0);
-			flush(dest << '\r'
-				<< setw(5) << setfill('.') << left << frame
-				<< setw(9) << right << fps << setfill(' '));
-			if((frame & 255) == 0) dest << '\n';
+		auto index = ++frame % window;
+		auto freq = SDL_GetPerformanceFrequency();
+		auto fps = float(freq)/(t1-t0);
+		rollsum += fps - store[index];
+		store[index] = fps;
+		if((frame > window) && !(frame % window)) {
+			float mean = rollsum/window, dev = 0, dev2 = 0;
+			for(unsigned i = 0; i < window; i++) {
+				auto diff = mean - store[i];
+				dev2 += diff*diff;
+			}
+			dev = sqrt(dev2/window);
+			dest << "Average: " << setw(6) << mean
+				<< "; std. deviation: " << dev << "\r";
+			(frame % (window*8)) ? flush(dest) : endl(dest);
 		}
 		t0 = t1;
 	}
