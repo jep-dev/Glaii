@@ -2,7 +2,6 @@
 #define MATRIX_HPP
 
 #include <abstract.hpp>
-#include <algorithm>
 
 namespace Geometry {
 

@@ -6,9 +6,8 @@
 namespace Presenter {
 	template<typename T>
 	struct Presenter_t;
-	/**
-	 * @brief Presenter type as per model-view-presenter (future Runnable)
-	 * @tparam T The derived class providing the update method
+	/** @brief Presenter type as per model-view-presenter (future Runnable)
+	 *  @tparam T The derived class providing the update method
 	 */
 	template<typename T>
 	struct Presenter_t: Abstract::Updatable_t<T> {

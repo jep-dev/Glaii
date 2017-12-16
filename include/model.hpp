@@ -9,9 +9,8 @@ namespace Model {
 	template<typename>
 	struct ModelBase;
 
-	/**
-	 * @brief Abstract Updatable model type (future Runnable)
-	 * @tparam T The derived class providing the update method
+	/** @brief Abstract Updatable model type (future Runnable)
+	 *  @tparam T The derived class providing the update method
 	 */
 	template<typename T>
 	struct ModelBase: Abstract::Updatable_t<T> {

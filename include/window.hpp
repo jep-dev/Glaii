@@ -3,8 +3,10 @@
 
 #include "events.hpp"
 
+///@cond
 #include <map>
 #include <glbinding/Binding.h>
+///@endcond
 
 namespace View {
 	using namespace gl;

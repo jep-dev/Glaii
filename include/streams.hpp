@@ -4,11 +4,13 @@
 #include "geometry.hpp"
 #include "matrix.hpp"
 
+///@cond
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <numeric>
 #include <functional>
+///@endcond
 
 namespace Streams {
 	using std::size_t;

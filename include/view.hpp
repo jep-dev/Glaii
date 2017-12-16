@@ -1,13 +1,16 @@
 #ifndef VIEW_HPP
 #define VIEW_HPP
 
+///@cond
 #include <deque>
-#include <glbinding/gl/gl.h>
-#include <SDL2/SDL_video.h>
-
-#include "abstract.hpp"
 #include <sstream>
 #include <string>
+
+#include <glbinding/gl/gl.h>
+#include <SDL2/SDL_video.h>
+///@endcond
+
+#include "abstract.hpp"
 
 namespace Streams {
 	/** @brief Deque of non-empty strings interpreted as errors. */

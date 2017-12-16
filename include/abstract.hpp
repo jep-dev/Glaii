@@ -1,9 +1,10 @@
 #ifndef ABSTRACT_HPP
 #define ABSTRACT_HPP
 
+///@cond
 #include <functional>
 #include <type_traits>
-#include <ostream>
+///@endcond
 
 // Deduce type from expression, generally for template arg defaults
 // TODO more generalized deductions than just infix operators?
@@ -19,15 +20,13 @@ namespace Abstract {
 	template<typename> struct Enable_t;
 	template<typename> struct Derived_t;
 	template<typename T> struct tag_id;
-	/**
-	 * @brief General-purpose type label/tag.
-	 * @tparam T The tagged type (optional)
+	/** @brief General-purpose type label/tag.
+	 *  @tparam T The tagged type (optional)
 	 */
 	template<typename T = null_type> struct tag_type {};
-	/**
-	 * @brief Alias for integral constant to match tag_ pattern
-	 * @tparam R The type of the value
-	 * @tparam T The value itself
+	/** @brief Alias for integral constant to match tag_ pattern
+	 *  @tparam R The type of the value
+	 *  @tparam T The value itself
 	 */
 	template<typename R, R T>
 	using tag_value = std::integral_constant<R,T>;
@@ -36,7 +35,7 @@ namespace Abstract {
 	template<typename S, typename... T> struct intf_require;
 
 	/*-- Value reductions --*/
-	/** @brief Variadic template OR type (base case). */
+	/* brief Variadic template OR type (base case). */
 	template<bool...>
 	struct any_true: std::false_type {};
 
@@ -49,9 +48,8 @@ namespace Abstract {
 	template<typename>
 	struct Enable_t: std::true_type {};
 
-	/**
-	 * @brief Helper type using CRTP for compile-time polymorphism.
-	 * @tparam D The type identified final result of derivation
+	/** @brief Helper type using CRTP for compile-time polymorphism.
+	 *  @tparam D The type identified final result of derivation
 	 */
 	template<typename D>
 	struct Derived_t {
@@ -81,9 +79,8 @@ namespace Abstract {
 		return d;
 	}
 
-	/*
-	 * @brief Creates a new sequence of UIDs for each template argument
-	 * @tparam D The tagged type, not necessarily derived from the tag itself
+	/** @brief Creates a new sequence of UIDs for each template argument
+	 *  @tparam D The tagged type, not necessarily derived from the tag
 	 */
 	template<typename D>
 	struct tag_id {
@@ -101,17 +98,16 @@ namespace Abstract {
 		unsigned get_id(void) const { return id; }
 	};
 
-	/**
-	 * @brief Inserts the instance's UID out of total issued of its type
-	 * @tparam D The tagged type, key to a UID sequence
-	 * @param dest The destination stream to insert the tagged instance
-	 * @param d The tag instance (not necessarily an instance of D)
-	 * @return The destination stream after insertion of the tag
+	/* @brief Inserts the instance's UID out of total issued of its type
+	 *  @tparam D The tagged type, key to a UID sequence
+	 *  @param dest The destination stream to insert the tagged instance
+	 *  @param d The tag instance (not necessarily an instance of D)
+	 *  @return The destination stream after insertion of the tag
 	 */
-	template<typename D>
+	/*template<typename D>
 	std::ostream& operator<<(std::ostream& dest, tag_id<D> const& d) {
 		return dest << '#' << d.get_id() << '/' << tag_id<D>::next_id();
-	}
+	}*/
 }
 
 #endif

@@ -3,7 +3,9 @@
 
 #include "abstract.hpp"
 
+///@cond
 #include <math.h>
+///@endcond
 
 #ifndef TOLERANCE
 #define TOLERANCE 512

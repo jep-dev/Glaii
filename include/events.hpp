@@ -1,8 +1,11 @@
 #ifndef EVENTS_HPP
 #define EVENTS_HPP
 
-#include "abstract.hpp"
+///@cond
 #include <SDL2/SDL_events.h>
+///@endcond
+
+#include "abstract.hpp"
 
 namespace Abstract {
 	/**
@@ -17,6 +20,7 @@ namespace Abstract {
 	 * @tparam D The type expected to handle the event
 	 * @tparam EV The type of the event to handle
 	 * @param hnd The handler: not type D or missing handle(EV)
+	 * @param ev The event to handle
 	 * @return True, vacuously - handle(EV) must be defined to fail.
 	 */
 	template<typename D, typename EV>
@@ -28,7 +32,8 @@ namespace Abstract {
 	 * @brief Passes an event to the (projected) handler.
 	 * @tparam D The type known and designated to handle the event
 	 * @tparam EV The type of the event to handle
-	 * @param hnd The handler instance intended to receive the event.
+	 * @param hnd The handler instance intended to receive the event
+	 * @param ev The event to handle
 	 * @return The type returned by the projected type's
 	 * corresponding method.
 	 */
