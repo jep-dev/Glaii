@@ -1,5 +1,6 @@
 #include "streams.hpp"
 #include "paster.hpp"
+#include <algorithm>
 
 namespace Streams {
 

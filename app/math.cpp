@@ -5,12 +5,14 @@
 #include "matrix.hpp"
 #include "streams.hpp"
 
+///@cond
 #include <iostream>
 #include <iomanip>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
+///@endcond
 
 using std::cout;
 using std::endl;

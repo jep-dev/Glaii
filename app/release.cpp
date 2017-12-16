@@ -1,7 +1,9 @@
+///@cond
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <SDL2/SDL.h>
+///@endcond
 
 #include "view.hpp"
 #include "streams.hpp"
