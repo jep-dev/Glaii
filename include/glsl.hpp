@@ -68,58 +68,21 @@ namespace View {
 			static constexpr auto N = sizeof...(EN)+1;
 			Shader shaders[N] = {{E0}, {EN}...};
 			const GLenum types[N] = {E0, EN...};
-			GLint uniform(const GLchar *name) const {
-				return glGetUniformLocation(m_id, name);
-			}
-			operator GLuint(void) const {
-				return m_id;
-			}
-			Shader& operator[](unsigned index) {
-				return shaders[index];
-			}
-			Shader const& operator[](unsigned index) const {
-				return shaders[index];
-			}
-			bool build(void) const {
-				for(auto i = 0; i < N; i++)
-					if(!shaders[i].build()) return false;
-				auto before = programIv(m_id, GL_ATTACHED_SHADERS);
-				for(auto i = 0; i < N; i++) {
-					glAttachShader(m_id, shaders[i]);
-				}
-				auto after = programIv(m_id, GL_ATTACHED_SHADERS);
-				auto diff = after - before;
-				if(diff != N) {
-					for(auto i = 0; i < diff; i++)
-						glDetachShader(m_id, shaders[i]);
-					return false;
-				}
-				glLinkProgram(m_id);
-				// TODO detach on link failure?
-				if(!programAssertIv(m_id, GL_LINK_STATUS, GLint(GL_TRUE)))
-					return false;
-				glValidateProgram(m_id);
-				return programAssertIv(m_id,
-					GL_VALIDATE_STATUS, GLint(GL_TRUE));
-			}
-			std::string info(void) const {
-				std::string out;
-				for(auto i = 0; i < N; i++)
-					out += shaders[i].info();
-				return out + programInfo(m_id);
-			}
-			bool use(void) const {
-				if(!programAssertIv(m_id, GL_LINK_STATUS, GLint(GL_TRUE)))
-					return false;
-				glUseProgram(m_id);
-				return true;
-			}
+			GLint uniform(const GLchar *name) const;
+			operator GLuint(void) const;
+			Shader& operator[](unsigned index);
+			Shader const& operator[](unsigned index) const;
+			bool build(void) const;
+			std::string info(void) const;
+			bool use(void) const;
 			template<typename T0, typename... TN>
 			Program(T0 const& t0, TN const&... tn):
 				Shader(), shaders{Shader(E0, t0), Shader(EN, tn)...} {}
 			// TODO detach shaders from destructor?
 		};
 	}
-
 }
+
+#include "glsl.tpp"
+
 #endif
