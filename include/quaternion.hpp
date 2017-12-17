@@ -12,18 +12,11 @@ namespace Geometry {
 	using Quatf = Quat_t<float>;
 	using Quatd = Quat_t<double>;
 
-	/*
-	 * Unit is a helper type bridging suffixes to quaternions (and future
-	 * unital algebras) - only necessary due to compiler shortcomings!
-	 *
-	 * The compiler selects (deduces) Quat_t<X> via implicit conversion
-	 * operators in Unit, but prohibits use of types dependent on deduced
-	 * X - like Quat_t<X> - without a helper providing these conversions;
-	 * lift-reduction (kappa calculus) should preclude the need for Unit.
-	 * TODO track; circumvent before design of unified hypercomplex.
-	 */
+	/// Enables a constant literal notation of quaternions (until compiler
+	/// support catches up for template argument deduction over operator"").
 	struct Unit {
-		// u in {0,1,2,3} -> {1,i,j,k}
+		/* This run-time "unit" identified by e and the planned
+		 * strongly-typed hypercomplex unit types are unrelated. */
 		unsigned e;
 		long double v;
 		operator Quatf(void) const;
@@ -49,15 +42,9 @@ namespace Geometry {
 		Quat_t<X> operator=(Quat_t<R> const& r);
 		Quat_t<X> operator*(void) const;
 		Quat_t<X> operator-(void) const;
-		/*X magnitude2(void) const;
-		X magnitude(void) const;
-		Quat_t<X> normalize(void) const;*/
 		template<typename R, typename XR = COMBINE(X,*,R)>
 		Quat_t<XR> operator*(Quat_t<R> const& r) const;
-		/**
-		 * @brief The 'conjugacy' or 'sandwich product', A^B := ABA*.
-		 * TODO: profiling; inlining? (C=AB, D=CA* vs. D=ABA*)
-		 */
+		/// @brief The 'conjugacy' or 'sandwich product', A^B := ABA*.
 		template<typename R, typename XR = COMBINE(X,*,R)>
 		Quat_t<XR> operator^(Vec_t<R> const& r) const;
 		template<typename R, typename XR = COMBINE(X,*,R)>
