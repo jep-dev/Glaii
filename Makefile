@@ -105,7 +105,6 @@ $(foreach N,$(NAMES_LIB),\
 		$(CXX) $(LDFLAGS) -shared -o $$@ $$< $(ROOTS_OBJ:%=-L%) $(LDLIBS))\
 )
 
-# %.d:
 $(COMPLETE): $(call TO_OBJ,$(NAMES_LIB) $(NAMES_BIN))
 	@echo $(CXXFLAGS) > $@
 .PRECIOUS: %.d $(COMPLETE)
