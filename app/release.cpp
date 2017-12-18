@@ -32,13 +32,9 @@
 bool run(std::ostream &dest, int n_frames) {
 	using namespace View;
 	using namespace Shaders;
-	using std::left;
-	using std::right;
 	using std::setw;
-	using std::setfill;
 	using std::flush;
 	using std::endl;
-	using std::setprecision;
 
 	unsigned w = 640, h = 480;
 	auto asp = float(w)/h;
@@ -60,29 +56,29 @@ bool run(std::ostream &dest, int n_frames) {
 	if(id_mvp == -1)
 		return dest << "MVP uniform not found!", false;
 
-	unsigned frame = 0, window = 30;
-	float rollsum = 0, store[window] = {0};
+	unsigned frame = 0, samples = 60;
+	float rollsum = 0, store[samples] = {0};
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
-	endl(dest << "FPS during " << window << " frames:");
-	dest << setprecision(5);
+	endl(dest << "FPS during " << samples << " frames:");
+	dest << std::setprecision(5);
 	while(win) {
 		if(!win.draw(frame, id_mvp)) break;
 		auto t1 = SDL_GetPerformanceCounter();
-		auto index = ++frame % window;
+		auto index = ++frame % samples;
 		auto freq = SDL_GetPerformanceFrequency();
 		auto fps = float(freq)/(t1-t0);
 		rollsum += fps - store[index];
 		store[index] = fps;
-		if((frame > window) && !(frame % window)) {
-			float mean = rollsum/window, dev = 0, dev2 = 0;
-			for(unsigned i = 0; i < window; i++) {
+		if((frame > samples) && !(frame % samples)) {
+			float mean = rollsum/samples, dev = 0, dev2 = 0;
+			for(unsigned i = 0; i < samples; i++) {
 				auto diff = mean - store[i];
 				dev2 += diff*diff;
 			}
-			dev = sqrt(dev2/window);
+			dev = sqrt(dev2/samples);
 			dest << "Average: " << setw(6) << mean
 				<< "; std. deviation: " << dev << "\r";
-			(frame % (window*8)) ? flush(dest) : endl(dest);
+			(frame % (samples*8)) ? flush(dest) : endl(dest);
 		}
 		t0 = t1;
 	}
