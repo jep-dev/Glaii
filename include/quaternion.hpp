@@ -69,16 +69,7 @@ namespace Geometry {
 	 * @return The quaternion representation of the rotation
 	 */
 	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	Quat_t<LR> rotation(L const& l, Vec_t<R> const& r) {
-		LR l2 = LR(l)/2, lc = LR(cos(l2)), ls = LR(sin(l2));
-		return Quat_t<LR>{lc, ls*r.x, ls*r.y, ls*r.z};
-	}
-
-	template<typename L, typename R, typename LR = COMBINE(L,*,R)>
-	Quat_t<LR> operator*(L const& l, Quat_t<R> const& r) {
-		return {LR(l*r.w), LR(l*r.x), LR(l*r.y), LR(l*r.z)};
-	}
-
+	Quat_t<LR> rotation(L const& l, Vec_t<R> const& r);
 
 	// User-defined suffixes, e.g. Quatf x = 1.0_j*1.0_k
 	// TODO template this; DRY, esp. anticipating ad-hoc hypercomplex
@@ -87,15 +78,6 @@ namespace Geometry {
 	Unit operator"" _i(long double v) { return {1,v}; }
 	Unit operator"" _j(long double v) { return {2,v}; }
 	Unit operator"" _k(long double v) { return {3,v}; }
-
-	Unit::operator Quatf(void) const {
-		float rijk[4] = { 0 }; rijk[e] = float(v);
-		return {rijk[0], rijk[1], rijk[2], rijk[3]};
-	}
-	Unit::operator Quatd(void) const {
-		double rijk[4] = { 0 }; rijk[e] = double(v);
-		return {rijk[0], rijk[1], rijk[2], rijk[3]};
-	}
 
 }
 #include "quaternion.tpp"

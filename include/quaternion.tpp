@@ -80,6 +80,26 @@ namespace Geometry {
 	Quat_t<XR> Quat_t<X>::operator/(R const& r) const {
 		return {w/r, x/r, y/r, z/r};
 	}
+	template<typename L, typename R, typename LR>
+	Quat_t<LR> rotation(L const& l, Vec_t<R> const& r) {
+		LR l2 = LR(l)/2, lc = LR(cos(l2)), ls = LR(sin(l2));
+		return Quat_t<LR>{lc, ls*r.x, ls*r.y, ls*r.z};
+	}
+
+	template<typename L, typename R, typename LR>
+	Quat_t<LR> operator*(L const& l, Quat_t<R> const& r) {
+		return {LR(l*r.w), LR(l*r.x), LR(l*r.y), LR(l*r.z)};
+	}
+
+
+	Unit::operator Quatf(void) const {
+		float rijk[4] = { 0 }; rijk[e] = float(v);
+		return {rijk[0], rijk[1], rijk[2], rijk[3]};
+	}
+	Unit::operator Quatd(void) const {
+		double rijk[4] = { 0 }; rijk[e] = double(v);
+		return {rijk[0], rijk[1], rijk[2], rijk[3]};
+	}
 }
 
 #endif
