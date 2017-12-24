@@ -1,7 +1,9 @@
-
 :root {
-	filter: invert(100%) hue-rotate(180deg);
+	background: black;
 }
-:root, body {
-	background: white;
+body, .tablist {
+	filter: invert(100%);
+}
+.tablist, .icondoc, .iconfopen {
+	filter: invert(100%) hue-rotate(180deg);
 }
