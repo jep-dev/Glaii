@@ -43,18 +43,25 @@ bool run(std::ostream &dest, int n_frames) {
 		{GLCTX(MAJOR_VERSION), 3}, {GLCTX(MINOR_VERSION), 3},
 		{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}
 	});
-	if(!win) return dest << win, false;
+	if(!win) {
+		dest << win;
+		return false;
+	}
 
 	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
-	if(!p.build())
-		return dest << "Could not build shader program\n"
-			<< p.info(), false;
+	if(!p.build()) {
+		dest << "Could not build shader program\n"
+			<< p.info();
+		return false;
+	}
 	p.use();
 
 	auto id_mvp = p.uniform("mvp");
-	if(id_mvp == -1)
-		return dest << "MVP uniform not found!", false;
+	if(id_mvp == -1) {
+		dest << "MVP uniform not found!";
+		return false;
+	}
 
 	unsigned frame = 0, samples = 60;
 	float rollsum = 0, store[samples] = {0};
@@ -83,6 +90,8 @@ bool run(std::ostream &dest, int n_frames) {
 		t0 = t1;
 	}
 	dest << '\n' << win;
+	// 'Validate' step still necessary as a post-mortem, since false means
+	// both 'quit' and 'fail' -- see note in src/Window.cpp
 	return win.validate();
 }
 
