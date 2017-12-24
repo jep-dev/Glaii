@@ -7,6 +7,7 @@ doc_dir?=doc/
 doc_name?=Doxyfile
 doc_file?=$(doc_dir)$(doc_name)
 
+DOXY_HTML_EXTRA_STYLESHEET=doc/style.css
 DOXY_BUILTIN_STL_SUPPORT?=YES
 DOXY_COLS_IN_ALPHA_INDEX?=5
 DOXY_DOT_TRANSPARENT?=YES
