@@ -1,3 +1,6 @@
+/*! @file include/dual_quaternion.hpp
+ *  @brief Extends quaternions' rotations, introducing axes at infinity */
+
 #ifndef DUAL_QUATERNION_HPP
 #define DUAL_QUATERNION_HPP
 

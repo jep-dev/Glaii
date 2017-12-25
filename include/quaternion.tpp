@@ -1,3 +1,6 @@
+/*! @file include/quaternion.tpp
+ *  @brief Implementation for include/quaternion.hpp */
+
 #ifndef QUATERNION_TPP
 #define QUATERNION_TPP
 

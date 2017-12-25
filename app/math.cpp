@@ -1,3 +1,7 @@
+/*! @file app/math.cpp
+ *  @brief Tests matrices, quaternions, and dual quaternions for visual
+ *  inspection; this is not a proper unit test, but rather, a sanity test
+ *  and/or a demo for the math constructs built so far. */
 
 #include "geometry.hpp"
 #include "quaternion.hpp"

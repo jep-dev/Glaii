@@ -1,3 +1,6 @@
+/*! @file include/model.hpp
+ *  @brief Stub for models; closely linked to 'geometry'. */
+
 #ifndef MODEL_HPP
 #define MODEL_HPP
 

@@ -1,3 +1,6 @@
+/*! @file include/geometry.hpp
+ *  @brief Root for quaternions, dual quaternions, and other geometry */
+
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
 

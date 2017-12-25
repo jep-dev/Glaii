@@ -1,3 +1,6 @@
+/*! @file include/matrix.hpp
+ *  @brief Defines 4x4 matrix types with basic operations */
+
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 

@@ -1,3 +1,6 @@
+/*! @file src/cutter.cpp
+ *  @brief Implementation of functions declared in cutter.hpp */
+
 #include "streams.hpp"
 #include "cutter.hpp"
 

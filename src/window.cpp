@@ -1,3 +1,6 @@
+/*! @file src/window.cpp
+ *  @brief Implementation of the methods and functions from window.hpp */
+
 #include "view.hpp"
 
 #include <SDL2/SDL.h>

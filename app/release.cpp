@@ -1,3 +1,9 @@
+/*! @file app/release.cpp
+ *  @brief Prototype for the true entry point; creates a window equipped with
+ *  a GL context, acquires and builds shaders, and runs the main event loop
+ *  with the bound shaders on a sample model. Features are added here as
+ *  proofs of concepts before integration into the appropriate module. */
+
 ///@cond
 #include <fstream>
 #include <iomanip>

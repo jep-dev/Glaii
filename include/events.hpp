@@ -1,3 +1,6 @@
+/*! @file include/events.hpp
+ *  @brief Events, handlers, and interface logic */
+
 #ifndef EVENTS_HPP
 #define EVENTS_HPP
 

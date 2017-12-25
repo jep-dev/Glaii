@@ -1,3 +1,6 @@
+/*! @file include/cutter.hpp
+ *  @brief Reads from external files vis RAII resource management */
+
 #ifndef CUTTER_HPP
 #define CUTTER_HPP
 

@@ -1,3 +1,6 @@
+/*! @file include/streams.tpp
+ *  @brief Implementations of functions declared by streams.hpp */
+
 #ifndef STREAMS_TPP
 #define STREAMS_TPP
 

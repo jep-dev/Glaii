@@ -1,3 +1,6 @@
+/*! @file glsl.hpp
+ *  @brief Declarations of shader sources and programs */
+
 #ifndef GLSL_HPP
 #define GLSL_HPP
 

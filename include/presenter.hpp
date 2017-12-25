@@ -1,3 +1,6 @@
+/*! @file include/presenter.hpp
+ *  @brief Contains the stub of the interface between model and view */
+
 #ifndef PRESENTER_HPP
 #define PRESENTER_HPP
 

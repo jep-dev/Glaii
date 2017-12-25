@@ -1,3 +1,6 @@
+/*! @file include/runnable.hpp
+ *  @brief Stub interface for 'runnable' types similar ot coroutines */
+
 #ifndef RUNNABLE_HPP
 #define RUNNABLE_HPP
 

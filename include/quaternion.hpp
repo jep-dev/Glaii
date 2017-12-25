@@ -1,3 +1,6 @@
+/*! @file include/quaternion.hpp
+ *  @brief Construction of the quaternion and its operations */
+
 #ifndef QUATERNION_HPP
 #define QUATERNION_HPP
 

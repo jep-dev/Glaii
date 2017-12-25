@@ -1,3 +1,6 @@
+/*! @file include/paster.hpp
+ *  @brief Contains printing and pretty-printing utilities */
+
 #ifndef PASTER_HPP
 #define PASTER_HPP
 

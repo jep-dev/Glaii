@@ -1,3 +1,11 @@
+/*! @file app/varia.cpp
+ *  @brief Explores the capabilities of tools from include/abstract.hpp and
+ *  more. Currently featured are structures and operations on tags that can
+ *  be used to determine how algorithms can be applied to otherwise
+ *  unstructured data, e.g. binary tree DFS over a simple list.
+ *  'Varia' as an homage to the Varia Suit of Super Metroid (implying that
+ *  this file should be a smoke test for TMP tools.) */
+
 #include "abstract.hpp"
 #include <iostream>
 

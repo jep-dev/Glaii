@@ -1,3 +1,6 @@
+/** @file include/window.hpp
+ * @brief Declares the Window and context for rendering */
+
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 

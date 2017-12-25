@@ -1,3 +1,6 @@
+/*! @file include/streams.hpp
+ *  @brief Root for IO, including iostream, 'Cutter' and 'Paster' */
+
 #ifndef STREAMS_HPP
 #define STREAMS_HPP
 

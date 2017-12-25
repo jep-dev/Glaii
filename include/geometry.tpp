@@ -1,3 +1,6 @@
+/*! @file include/geometry.tpp
+ *  @brief Implementation of the declared functions in gometry.hpp */
+
 #ifndef GEOMETRY_TPP
 #define GEOMETRY_TPP
 

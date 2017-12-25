@@ -1,3 +1,6 @@
+/*! @file abstract.hpp
+ *  @brief TMP utilities, e.g. instance counters, CRTP bases, etc. */
+
 #ifndef ABSTRACT_HPP
 #define ABSTRACT_HPP
 

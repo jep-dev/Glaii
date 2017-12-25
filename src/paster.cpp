@@ -1,3 +1,6 @@
+/*! @file src/paster.cpp
+ *  @brief File reading with resources managed through RAII */
+
 #include "streams.hpp"
 #include "paster.hpp"
 #include <algorithm>

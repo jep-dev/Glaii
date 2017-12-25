@@ -1,3 +1,6 @@
+/*! @file include/view.hpp
+ * @brief Root for view modules, e.g. Shader, Window */
+
 #ifndef VIEW_HPP
 #define VIEW_HPP
 
@@ -11,6 +14,8 @@
 ///@endcond
 
 #include "abstract.hpp"
+
+namespace View {}
 
 namespace Streams {
 	/** @brief Deque of non-empty strings interpreted as errors. */

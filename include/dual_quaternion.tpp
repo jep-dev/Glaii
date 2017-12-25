@@ -1,3 +1,6 @@
+/*! @file include/dual_quaternions.tpp
+ *  @brief Implementations from declarations in dual_quaternions.hpp */
+
 #ifndef DUAL_QUATERNION_TPP
 #define DUAL_QUATERNION_TPP
 
