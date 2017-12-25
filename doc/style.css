@@ -1,9 +1,52 @@
 :root {
-	background: black;
+	background: #222;
 }
 body, .tablist {
-	filter: invert(100%);
+	background: transparent;
+	filter: invert(100%) hue-rotate(240deg);
 }
-.tablist, .icondoc, .iconfopen {
-	filter: invert(100%) hue-rotate(180deg);
+.tablist, .icondoc, .iconfopen, .ah {
+	filter: invert(100%) hue-rotate(-120deg);
 }
+a.el {
+	filter: hue-rotate(20deg) saturate(2.0);
+}
+
+div.ah, span.ah {
+	border-radius: .75em;
+}
+.directory tr.even {
+	filter: brightness(0.95);
+}
+
+/* TODO apply columns only when .content is the root of a flat hierarchy.
+ * On pages like 'namespacemembers' this looks great, but 'classes', any
+ * file with its dependency graph, etc. will look terrible. Post-process?
+ * Use Doxygen as a preprocessor and process pseudo-doc to HTML? Customize
+ * or modify Doxygen itself? */
+
+/*.contents {
+	column-count: 2;
+	column-gap: 1em;
+}
+.contents > ul {
+	clear: right;
+}
+.contents > h3 {
+	clear: left;
+	width: 100%;
+	border-radius: .25em;
+	background: rgba(255,0,255,0.2);
+	filter: drop-shadow(2px 2px 0px white);
+	text-align: center;
+	display: inline;
+}
+.contents > h3, .contents > ul, .contents > li {
+	margin: 0;
+	padding: 0;
+}
+.contents > h3, .contents > ul {
+	display: inline-block;
+	float: left;
+	clear: none;
+}*/
