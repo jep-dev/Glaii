@@ -13,65 +13,60 @@
 namespace Abstract {
 
 	struct FSignal {
-		unsigned char error : 2;
+		typedef enum Code : unsigned char {
+			ok = 0,
+			err = 1,
+			quit = 2
+		} Code;
+		Code error;
+		//unsigned char error : 2;
 		operator bool(void) const { return error == 0; }
 	};
 
-	/**
-	 * @brief Identifies D as a base with the desired handler implementation.
-	 * @tparam D The targeted type; passes unhandled events implicitly.
-	 */
-	template<typename D>
-	struct Handler_t {};
+	/** @brief CRTP subscription of type D to each event type. */
+	template<typename D, typename... E>
+	struct Handler_t {
+		template<typename E1>
+		FSignal handle(E1 const& ev);
+	};
+	template<typename D, typename E0, typename... EN>
+	struct Handler_t<D, E0, EN...>: Handler_t<D, EN...> {
+		FSignal handle(E0 const& ev) {
+			return static_cast<D&>(*this).handle(ev);
+		}
+		using Handler_t<D, EN...>::handle;
+	};
 
-	/**
-	 * @brief Policy for handlers unprepared for the given event.
-	 * @tparam D The type expected to handle the event
-	 * @tparam EV The type of the event to handle
-	 * @param hnd The handler: not type D or missing handle(EV)
-	 * @param ev The event to handle
-	 * @return Done, without a defined handle(EV).
-	 */
-	/*template<typename D, typename EV>
-	FSignal call_handler(Handler_t<D>& hnd, EV const& ev, long) {
+	template<typename D, typename... EN, typename E0>
+	FSignal call_handler(Handler_t<D, EN...>& hnd, E0 const& ev) {
 		return {0};
-	}*/
+	}
+	template<typename D, typename E0, typename... EN>
+	FSignal call_handler(Handler_t<D, E0, EN...>& hnd, E0 const& ev) {
+		return hnd.handle(ev);
+	}
 
-	/**
-	 * @brief Passes an event to the (projected) handler.
-	 * @tparam D The type known and designated to handle the event
-	 * @tparam EV The type of the event to handle
-	 * @param hnd The handler instance intended to receive the event
-	 * @param ev The event to handle
-	 * @return The type returned by the projected type's
-	 * corresponding method.
-	 */
-	/*template<typename D, typename EV>
-	FSignal call_handler(Handler_t<D>& hnd, EV const& ev, int) {
-		return static_cast<D&>(hnd).handle(ev);
-	}*/
-	/**
-	 * @brief Separates event components since this is almost certainly
-	 * not the responsibility of the handler.
-	 * @tparam D The handler's implementation type
-	 * @param hnd The instance given to handle event components
-	 * @param ev The event as its base, undifferentiated 'events'
-	 */
-	template<typename D>
-	FSignal call_handler(Handler_t<D>& handler, SDL_Event const& ev) {
-		auto& hnd = static_cast<D&>(handler);
+	/** @brief Calls individual dispatchers so the handler can opt into
+	 * individual event types. */
+	template<typename D, typename... EN>
+	FSignal call_handler(
+		Handler_t<D, EN...>& hnd, SDL_Event const& ev) {
+		//D& hnd, SDL_Event const& ev) {
 		switch(ev.type) {
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEBUTTONDOWN:
-				return hnd.handle(ev.button);
+				return call_handler(hnd, ev.button);
 			case SDL_MOUSEMOTION:
-				return hnd.handle(ev.motion);
+				return call_handler(hnd, ev.motion);
 			case SDL_WINDOWEVENT:
-				return hnd.handle(ev.window);
+				return call_handler(hnd, ev.window);
 			case SDL_KEYDOWN:
-				return hnd.handle(ev.key);
+				return call_handler(hnd, ev.key);
+			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_CONTROLLERBUTTONUP:
+				return call_handler(hnd, ev.cbutton);
 			case SDL_QUIT:
-				return hnd.handle(ev.quit);
+				return call_handler(hnd, ev.quit);
 			default:
 				return {0};
 		}

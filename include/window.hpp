@@ -25,8 +25,8 @@ namespace View {
 	struct Window:
 		Abstract::Derived_t<Window>,
 		Abstract::Updatable_t<Window>,
-		Abstract::Handler_t<Window>
-	{
+		Abstract::Handler_t<Window, SDL_QuitEvent, SDL_WindowEvent,
+			SDL_MouseButtonEvent, SDL_MouseMotionEvent, SDL_KeyboardEvent> {
 	protected:
 		SDL_Window *m_win;
 		Streams::ErrorFIFO m_errors;

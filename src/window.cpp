@@ -28,14 +28,16 @@ namespace View {
 		return dest << "Window: " << src.m_errors;
 	}
 	FSignal Window::validate(void) {
+		//using FSignal::Code;
 		if(m_errors()) {
 			if(m_live) {
 				m_live = false;
-				return {1};
+				return {FSignal::Code::err};
+				//return {1};
 			}
-			return {2};
+			return {FSignal::Code::quit};
 		}
-		return {0};
+		return {FSignal::Code::ok};
 		/*if(!m_live) return {2};
 		if(!(m_live &= !m_errors())) return {1};*/
 		// return {!m_live || !(m_live &= !m_errors())};
@@ -58,17 +60,20 @@ namespace View {
 			} default: return {0};
 		}
 	}
-	FSignal Window::handle(SDL_KeyboardEvent const& ev) {
+	/*FSignal Window::handle(SDL_KeyboardEvent const& ev) {
 		switch(ev.keysym.scancode) {
 			case SDL_SCANCODE_ESCAPE: return {2};
 			default: return {0};
 		}
-	}
+	}*/
 	FSignal Window::update(unsigned frame) {
 		if(!validate()) return {1};
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev)) {
-			auto res = call_handler(*this, ev);
+			auto res = call_handler(static_cast<
+				Abstract::Handler_t<Window, SDL_QuitEvent,
+				SDL_WindowEvent, SDL_MouseButtonEvent,
+				SDL_MouseMotionEvent, SDL_KeyboardEvent>&>(*this), ev);
 			if(res.error) return res;
 		}
 		return {!validate()};
