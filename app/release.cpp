@@ -74,7 +74,7 @@ bool run(std::ostream &dest, int n_frames) {
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
 	endl(dest << "FPS during " << samples << " frames:");
 	dest << std::setprecision(5);
-	FSignal res = {0};
+	FSignal res = {FSignal::Code::ok};
 	while(win) {
 		res = win.draw(frame, id_mvp);
 		if(!res) break;

@@ -39,7 +39,7 @@ namespace Abstract {
 
 	template<typename D, typename... EN, typename E0>
 	FSignal call_handler(Handler_t<D, EN...>& hnd, E0 const& ev) {
-		return {0};
+		return {FSignal::Code::ok};
 	}
 	template<typename D, typename E0, typename... EN>
 	FSignal call_handler(Handler_t<D, E0, EN...>& hnd, E0 const& ev) {
@@ -68,7 +68,7 @@ namespace Abstract {
 			case SDL_QUIT:
 				return call_handler(hnd, ev.quit);
 			default:
-				return {0};
+				return {FSignal::Code::ok};
 		}
 	}
 

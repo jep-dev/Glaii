@@ -33,41 +33,51 @@ namespace View {
 			if(m_live) {
 				m_live = false;
 				return {FSignal::Code::err};
-				//return {1};
 			}
 			return {FSignal::Code::quit};
 		}
 		return {FSignal::Code::ok};
-		/*if(!m_live) return {2};
+		/*if(!m_live) return {FSignal::Code::quit};
 		if(!(m_live &= !m_errors())) return {1};*/
 		// return {!m_live || !(m_live &= !m_errors())};
 	}
-	FSignal Window::handle(SDL_MouseMotionEvent const& ev) { return {0}; }
-	FSignal Window::handle(SDL_MouseButtonEvent const& ev) { return {0}; }
-	FSignal Window::handle(SDL_QuitEvent const& ev) { return {2}; }
+	FSignal Window::handle(SDL_MouseMotionEvent const& ev) {
+		return {FSignal::Code::ok};
+		//return {0};
+	}
+	FSignal Window::handle(SDL_MouseButtonEvent const& ev) {
+		return {FSignal::Code::ok};
+		//return {0};
+	}
+	FSignal Window::handle(SDL_QuitEvent const& ev) { return {FSignal::Code::quit}; }
 	FSignal Window::handle(SDL_WindowEvent const& ev) {
 		switch(ev.type) {
-			case SDL_WINDOWEVENT_CLOSE: return {2};
+			case SDL_WINDOWEVENT_CLOSE:
+				return {FSignal::Code::quit};
+				//return {FSignal::Code::quit};
 			case SDL_WINDOWEVENT_RESIZED: {
 				int p1 = 0, p2 = 0;
 				SDL_GetWindowSize(m_win, &p1, &p2);
-				if(!p1 || !p2) return {1};
-				if(p1 != ev.data1 || p2 != ev.data2) return {1};
+				if(!p1 || !p2)
+					return {FSignal::Code::err};
+				if(p1 != ev.data1 || p2 != ev.data2)
+					return {FSignal::Code::err};
 				m_width = ev.data1;
 				m_height = ev.data2;
 				glViewport(0, 0, m_width, m_height);
 				break;
-			} default: return {0};
+			} default: return {FSignal::Code::ok};
 		}
 	}
-	/*FSignal Window::handle(SDL_KeyboardEvent const& ev) {
+	FSignal Window::handle(SDL_KeyboardEvent const& ev) {
 		switch(ev.keysym.scancode) {
-			case SDL_SCANCODE_ESCAPE: return {2};
-			default: return {0};
+			case SDL_SCANCODE_ESCAPE: return {FSignal::Code::quit};
+			default: return {FSignal::Code::ok};
 		}
-	}*/
+	}
 	FSignal Window::update(unsigned frame) {
-		if(!validate()) return {1};
+		if(!validate())
+			return {FSignal::Code::err};
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev)) {
 			auto res = call_handler(static_cast<
@@ -76,19 +86,19 @@ namespace View {
 				SDL_MouseMotionEvent, SDL_KeyboardEvent>&>(*this), ev);
 			if(res.error) return res;
 		}
-		return {!validate()};
+		return {validate()};
 	}
 	FSignal Window::draw(unsigned frame, GLint id_mvp) {
 		static constexpr unsigned mspf60 = 100/6+1;
-		if(id_mvp == -1) return {1};
+		if(id_mvp == -1) return {FSignal::Code::err};
 		auto up_res = update(frame);
 		if(!up_res) return up_res;
-		//if(!update(frame)) return {1};
+		//if(!update(frame)) return {FSignal::Code::err};
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		int l_width = 0, l_height = 0;
 		SDL_GetWindowSize(m_win, &l_width, &l_height);
-		if(l_width <= 0 || l_height <= 0) return {1};
+		if(l_width <= 0 || l_height <= 0) return {FSignal::Code::err};
 		glViewport(0, 0, l_width, l_height);
 		m_width = l_width;
 		m_height = l_height;
@@ -145,7 +155,7 @@ namespace View {
 
 		SDL_GL_SwapWindow(m_win);
 		SDL_Delay(mspf60);
-		return {!validate()};
+		return {validate()};
 	}
 
 	Window::Window(const char *title, int w, int h,
