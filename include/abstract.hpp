@@ -17,6 +17,11 @@
 
 namespace Abstract {
 
+	template<typename...> struct make_void
+		{ typedef void type; };
+	template<typename... T> using void_t =
+		typename make_void<T...>::type;
+
 	/*-- CRTP helper types --*/
 	/** @brief Helper type analogous to null-terminator for strings. */
 	struct null_type {};
