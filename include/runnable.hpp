@@ -11,7 +11,9 @@ namespace Abstract {
 	 * @tparam D The derived type of the implementation class
 	 */
 	template<typename D>
-	struct Updatable_t {};
+	struct Updatable_t {
+		//typedef decltype(D::update) update_type;
+	};
 }
 
 /**
@@ -26,12 +28,12 @@ namespace Abstract {
  * @param v The arguments given by value
  * @return True if and only if the derived implementation returns true
  */
-template<typename S, typename... T, typename... U, typename... V>
-bool update(Abstract::Updatable_t<S> const& s,
+/*template<typename S, typename... T, typename... U, typename... V>
+FSignal update(Abstract::Updatable_t<S> const& s,
 		T &... t, U const&... u, V &&... v) {
 	return static_cast<S const&>(s)
 		.update(t..., u..., std::forward<V>(v)...);
-}
+}*/
 /**
  * @brief Updates the given subject using its derived implementation
  * @tparam S The class providing the derived implementation of update
@@ -44,12 +46,12 @@ bool update(Abstract::Updatable_t<S> const& s,
  * @param v The arguments given by value
  * @return True if and only if the derived implementation returns true
  */
-template<typename S, typename... T, typename... U, typename... V>
-bool update(Abstract::Updatable_t<S>& s,
+/*template<typename S, typename... T, typename... U, typename... V>
+FSignal update(Abstract::Updatable_t<S>& s,
 		T &... t, U const&... u, V &&... v) {
 	return static_cast<S&>(s)
 		.update(t..., u..., std::forward<V>(v)...);
-}
+}*/
 
 
 #endif

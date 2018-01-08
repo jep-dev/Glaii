@@ -36,14 +36,12 @@ namespace Shaders {
 		GLchar buf[len];
 		glGetProgramInfoLog(id, len, 0, buf);
 		return buf;
-		//return std::string(buf);
 	}
 	std::string shaderInfo(GLuint id) {
 		auto len = shaderIv(id, GL_INFO_LOG_LENGTH);
 		GLchar buf[len];
 		glGetShaderInfoLog(id, len, 0, buf);
 		return buf;
-		//return std::string(buf);
 	}
 	std::string queryInfo(GLuint id) {
 		if(glIsProgram(id)) return programInfo(id);

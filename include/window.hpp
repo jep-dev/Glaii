@@ -40,14 +40,16 @@ namespace View {
 
 		friend std::ostream&
 		operator<<(std::ostream &dest, Window const& src);
-		bool validate(void);
+		FSignal validate(void);
 
-		bool handle(SDL_QuitEvent const& ev);
-		bool handle(SDL_WindowEvent const& ev);
-		bool handle(SDL_KeyboardEvent const& ev);
+		FSignal handle(SDL_QuitEvent const& ev);
+		FSignal handle(SDL_WindowEvent const& ev);
+		FSignal handle(SDL_MouseButtonEvent const& ev);
+		FSignal handle(SDL_MouseMotionEvent const& ev);
+		FSignal handle(SDL_KeyboardEvent const& ev);
 
-		bool update(unsigned frame);
-		bool draw(unsigned frame, GLint id_mvp);
+		FSignal update(unsigned frame);
+		FSignal draw(unsigned frame, GLint id_mvp);
 
 		Window(const char *title, int w, int h,
 			Uint32 flags, std::map<SDL_GLattr, int> const& attribs);
