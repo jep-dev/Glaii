@@ -74,8 +74,10 @@ bool run(std::ostream &dest, int n_frames) {
 	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
 	endl(dest << "FPS during " << samples << " frames:");
 	dest << std::setprecision(5);
+	FSignal res = {0};
 	while(win) {
-		if(!win.draw(frame, id_mvp)) break;
+		res = win.draw(frame, id_mvp);
+		if(!res) break;
 		auto t1 = SDL_GetPerformanceCounter();
 		auto index = ++frame % samples;
 		auto freq = SDL_GetPerformanceFrequency();
@@ -95,7 +97,8 @@ bool run(std::ostream &dest, int n_frames) {
 		}
 		t0 = t1;
 	}
-	dest << '\n' << win;
+	dest << "Window exited with status " << (unsigned)res.error
+		<< " (living=0, failing=1, quitting=2)\n" << win;
 	// 'Validate' step still necessary as a post-mortem, since false means
 	// both 'quit' and 'fail' -- see note in src/Window.cpp
 	return win.validate();
