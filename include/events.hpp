@@ -64,19 +64,14 @@ namespace Abstract {
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEBUTTONDOWN:
 				return hnd.handle(ev.button);
-				//return call_handler(hnd, ev.button, 0);
 			case SDL_MOUSEMOTION:
 				return hnd.handle(ev.motion);
-				//return call_handler(hnd, ev.motion, 0);
 			case SDL_WINDOWEVENT:
 				return hnd.handle(ev.window);
-				//return call_handler(hnd, ev.window, 0);
 			case SDL_KEYDOWN:
 				return hnd.handle(ev.key);
-				//return call_handler(hnd, ev.key, 0);
 			case SDL_QUIT:
 				return hnd.handle(ev.quit);
-				//return call_handler(hnd, ev.quit, 0);
 			default:
 				return {0};
 		}
