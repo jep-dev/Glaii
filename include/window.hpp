@@ -29,13 +29,13 @@ namespace View {
 		Abstract::Updatable_t<Window>,
 		Abstract::Handler_t<Window> {
 	protected:
-		bool m_live;
+		FSignal m_live;
 		SDL_Window *m_win;
 		SDL_GLContext m_ctx;
 		Streams::ErrorFIFO m_errors;
 	public:
 		unsigned m_width, m_height;
-		operator bool(void) const;
+		//operator bool(void) const;
 		operator SDL_Window *const(void) const;
 		operator SDL_GLContext const(void) const;
 
