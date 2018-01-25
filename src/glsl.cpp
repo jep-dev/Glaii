@@ -1,6 +1,7 @@
 /*! @file src/glsl.cpp
  *  @brief Implementation of the functions declared in include/glsl.hpp */
 
+#include "glsl.hpp"
 #include "view.hpp"
 
 namespace View {

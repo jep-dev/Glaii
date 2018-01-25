@@ -79,7 +79,4 @@ namespace View {
 	}
 }
 
-//#include "glsl.hpp"
-//#include "window.hpp"
-
 #endif

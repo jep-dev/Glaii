@@ -11,7 +11,8 @@
 #include <SDL2/SDL.h>
 ///@endcond
 
-#include "view.hpp"
+#include "window.hpp"
+#include "glsl.hpp"
 #include "streams.hpp"
 
 #include "geometry.hpp"
