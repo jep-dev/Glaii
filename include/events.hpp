@@ -12,9 +12,7 @@ namespace Abstract {
 
 	struct FSignal {
 		typedef enum Code : unsigned char {
-			ok = 0,
-			err = 1,
-			quit = 2
+			ok = 0, quit, err
 		} Code;
 		Code error;
 		const char *message = "(default)";
