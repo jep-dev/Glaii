@@ -13,8 +13,6 @@
 #include <SDL2/SDL_video.h>
 ///@endcond
 
-//#include "abstract.hpp"
-
 namespace View {}
 
 namespace Streams {

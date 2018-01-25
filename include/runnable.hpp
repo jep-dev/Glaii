@@ -4,8 +4,6 @@
 #ifndef RUNNABLE_HPP
 #define RUNNABLE_HPP
 
-#include "abstract.hpp"
-
 namespace Abstract {
 	/** @brief Interface for types supporting calls to update through CRTP.
 	 * @tparam D The derived type of the implementation class
