@@ -11,7 +11,7 @@ DOXY_HTML_EXTRA_STYLESHEET=doc/style.css
 DOXY_BUILTIN_STL_SUPPORT?=YES
 DOXY_COLS_IN_ALPHA_INDEX?=5
 DOXY_DOT_TRANSPARENT?=YES
-DOXY_EXCLUDE_PATTERNS?=*.o, *.d, *.tpp, *.h, */obj/*
+DOXY_EXCLUDE_PATTERNS?=*.o, *.d, *.h, */obj/*
 DOXY_EXTRACT_ALL?=YES
 DOXY_EXTRACT_PRIVATE?=YES
 DOXY_EXTRACT_PACKAGE?=YES
@@ -26,7 +26,8 @@ DOXY_STRIP_FROM_PATH?=./
 DOXY_WARNINGS=NO
 
 override DOXY_INPUT+=$(DOXY_USE_MDFILE_AS_MAINPAGE) \
-	$(foreach V,hpp cpp,$(wildcard $($(V)_dir)*.$(V)))
+	$(wildcard $(foreach T,hpp tpp cpp,\
+		$(foreach D,APP SRC HDR,$(DIR_$(D))*.$(T))))
 
 V_DOXY_ALL=$(filter DOXY_%,$(.VARIABLES))
 V_DOXY_ALL_SUFFIXES=$(V_DOXY_ALL:DOXY_%=%)
