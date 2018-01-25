@@ -13,7 +13,7 @@
 #include <SDL2/SDL_video.h>
 ///@endcond
 
-#include "abstract.hpp"
+//#include "abstract.hpp"
 
 namespace View {}
 
@@ -81,7 +81,7 @@ namespace View {
 	}
 }
 
-#include "glsl.hpp"
-#include "window.hpp"
+//#include "glsl.hpp"
+//#include "window.hpp"
 
 #endif

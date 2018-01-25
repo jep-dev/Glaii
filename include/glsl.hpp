@@ -4,11 +4,9 @@
 #ifndef GLSL_HPP
 #define GLSL_HPP
 
-// #include <SDL2/SDL_video.h>
+#include "view.hpp"
 
 namespace View {
-	using namespace Abstract;
-
 	namespace Shaders {
 
 		/** @brief RAII shader program with at least one member

@@ -1,8 +1,8 @@
-/*! @file include/glsl.tpp
- *  @brief Implementations from declarations in glsl.hpp */
-
 #ifndef GLSL_TPP
 #define GLSL_TPP
+
+/*! @file include/glsl.tpp
+ *  @brief Implementations from declarations in glsl.hpp */
 
 namespace View {
 	namespace Shaders {
