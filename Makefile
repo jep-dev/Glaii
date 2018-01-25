@@ -9,7 +9,7 @@ define BREAK
 $(1)
 $(1:%=  )  
 endef
-BR:=$(call BREAK,\)#) <- 'Escaped' paren confuses highlighters
+BR:=$(call BREAK,\)#) <- Backslashes can confuse highlighters/validaters
 
 DIR_APP:=app/
 DIR_SRC:=src/
@@ -164,4 +164,4 @@ clean: $(addprefix clean-,EXE SO O D COMPLETE)
 
 # Generate auto-dep injection - what could go wrong?
 -include $(call PAT_D,$(NAMES_EXE) $(NAMES_SO))
-# include Doxygen.mk
+include Doxygen.mk
