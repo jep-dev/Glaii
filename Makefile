@@ -42,6 +42,7 @@ PAT_TD=$(1:%=$(DEST_DIR)obj/%.Td)
 PAT_O=$(1:%=obj/%.o)
 PAT_SO=$(1:%=lib/lib%.so)
 PAT_EXE=$(1:%=$(DEST_DIR)bin/%)
+WPAT=$(wildcard $(call PAT_$(1),$2))
 
 # Pattern inverses; both paths are taken so that the pipeline is flexible;
 # sources and targets can be added/removed/etc. beyond their automatic
@@ -83,10 +84,10 @@ CONFIG_O=$(call PKG_CONFIG,--cflags,$1)
 CONFIG_SO=$(call PKG_CONFIG,--libs,$1)
 
 # Preserve alternate application sources from configuration
-override SRCS_EXE+=$(wildcard $(DIR_APP)*.cpp)
+override SRCS_EXE+=$(call WPAT,APP,*)
 # Only remove this if app and library byproducts are separated!
 #   obj/.o,.d,.Td files will collide until the next Makefile version.
-SRCS_SO:=$(filter-out $(SRCS_EXE),$(SRCS_SO) $(wildcard $(DIR_SRC)*.cpp))
+override SRCS_SO:=$(filter-out $(SRCS_EXE),$(SRCS_SO) $(call WPAT,CPP,*))
 
 $(eval NAMES_EXE:=$(call UNPAT_APP,$(SRCS_EXE)))
 $(eval NAMES_SO:=$(call UNPAT_CPP,$(SRCS_SO)))
@@ -150,9 +151,10 @@ $(COMPLETE): $(FILES_SO) $(FILES_EXE); @echo $(CXXFLAGS) > $@
 #temp.txt: override CXXFLAGS+=$(shell date)
 #temp.txt:; @echo $(CXXFLAGS) >>$@
 
+val-%:; @echo $($*)
 var-%:; @echo '"$$($*)"="$($*)"'
 vars-%:; @$(foreach V,$($*),echo '$V={$($V)}';)
-.PHONY: var-% vars-% clean-% clean
+.PHONY: val-% var-% vars-% clean-% clean
 
 # Now clean-main removes bin/main, and clean-bin and clean-EXE are the same
 #   - but this is too greedy to run without a --dry-run pass, which outweighs

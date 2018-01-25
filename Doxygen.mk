@@ -3,9 +3,7 @@ doxygen?=doxygen
 doxymake=$(doxygen) -g
 
 # Input parameters
-doc_dir?=doc/
-doc_name?=Doxyfile
-doc_file?=$(doc_dir)$(doc_name)
+DIR_DOC?=doc/
 
 DOXY_HTML_EXTRA_STYLESHEET=doc/style.css
 DOXY_BUILTIN_STL_SUPPORT?=YES
@@ -16,7 +14,7 @@ DOXY_EXTRACT_ALL?=YES
 DOXY_EXTRACT_PRIVATE?=YES
 DOXY_EXTRACT_PACKAGE?=YES
 DOXY_GENERATE_MAN?=YES
-DOXY_OUTPUT_DIRECTORY=$(doc_dir)
+DOXY_OUTPUT_DIRECTORY=$(DIR_DOC)
 DOXY_QT_AUTOBRIEF?=YES
 DOXY_MULTILINE_CPP_IS_BRIEF=YES
 DOXY_RECURSIVE?=YES
@@ -25,19 +23,17 @@ DOXY_STRIP_FROM_PATH?=./
 
 DOXY_WARNINGS=NO
 
-override DOXY_INPUT+=$(DOXY_USE_MDFILE_AS_MAINPAGE) \
-	$(wildcard $(foreach T,hpp tpp cpp,\
-		$(foreach D,APP SRC HDR,$(DIR_$(D))*.$(T))))
+override DOXY_INPUT+=$(DOXY_USE_MDFILE_AS_MAINPAGE) $(SRCS_EXE) $(SRCS_SO)
 
 V_DOXY_ALL=$(filter DOXY_%,$(.VARIABLES))
 V_DOXY_ALL_SUFFIXES=$(V_DOXY_ALL:DOXY_%=%)
 V_DOXY_REPLACEMENT=$(foreach V,$(V_DOXY_ALL_SUFFIXES),\\n$(V) = $(DOXY_$(V)))
 
-$(doc_file): Doxygen.mk $(call TO_OBJ,$(NAMES_LIB) $(NAMES_BIN)) $(DOXY_INPUT)
-	@$(doxymake) $(doc_file) >/dev/null && \
-		echo $(V_DOXY_REPLACEMENT) >> $(doc_file)
+$(doc_file): Doxygen.mk $(DOXY_INPUT)
+	@$(doxymake) $(DIR_DOC)Doxyfile >/dev/null && \
+		echo $(strip $(V_DOXY_REPLACEMENT)) >> $(doc_file)
 
-doc: Doxygen.mk $(doc_file)
-	@$(doxygen) $(doc_file) >/dev/null
-clean-doc:; $(RM) $(doc_file)
+doc: Doxygen.mk $(DIR_DOC)Doxyfile
+	@$(doxygen) $(DIR_DOC)Doxyfile >/dev/null
+clean-doc:; $(RM) $(DIR_DOC)Doxyfile
 .PHONY: doc clean-doc
