@@ -4,6 +4,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
+#include "view.hpp"
 #include "events.hpp"
 
 ///@cond
@@ -18,22 +19,20 @@ namespace View {
 }
 
 #include "runnable.hpp"
+#include "view.hpp"
 
 namespace View {
+	using Abstract::FSignal;
 
-	//template struct Abstract::Handler_t<Window>;
 	/** @brief RAII and operations on an SDL window/context pair. */
 	struct Window:
-		Abstract::Derived_t<Window>,
 		Abstract::Updatable_t<Window>,
-		/*Abstract::Handler_t<Window, SDL_QuitEvent, SDL_WindowEvent,
-			SDL_MouseButtonEvent, SDL_MouseMotionEvent, SDL_KeyboardEvent>*/
 		Abstract::Handler_t<Window> {
 	protected:
-		SDL_Window *m_win;
-		Streams::ErrorFIFO m_errors;
-		SDL_GLContext m_ctx;
 		bool m_live;
+		SDL_Window *m_win;
+		SDL_GLContext m_ctx;
+		Streams::ErrorFIFO m_errors;
 	public:
 		unsigned m_width, m_height;
 		operator bool(void) const;
@@ -44,12 +43,6 @@ namespace View {
 		operator<<(std::ostream &dest, Window const& src);
 		FSignal validate(void);
 		template<typename T> FSignal handle(T const& ev);
-
-		/*FSignal handle(SDL_QuitEvent const& ev);
-		FSignal handle(SDL_WindowEvent const& ev);
-		FSignal handle(SDL_MouseButtonEvent const& ev);
-		FSignal handle(SDL_MouseMotionEvent const& ev);
-		FSignal handle(SDL_KeyboardEvent const& ev);*/
 
 		FSignal update(unsigned frame);
 		FSignal draw(unsigned frame, GLint id_mvp);

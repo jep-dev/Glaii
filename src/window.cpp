@@ -2,6 +2,7 @@
  *  @brief Implementation of the methods and functions from window.hpp */
 
 #include "view.hpp"
+#include "window.hpp"
 
 #include <SDL2/SDL.h>
 
