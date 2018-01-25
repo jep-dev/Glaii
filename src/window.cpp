@@ -28,40 +28,39 @@ namespace View {
 		return dest << "Window: " << src.m_errors;
 	}
 	FSignal Window::validate(void) {
-		//using FSignal::Code;
 		if(m_errors()) {
-			if(m_live) {
-				m_live = false;
-				return {FSignal::Code::err};
-			}
-			return {FSignal::Code::quit};
+			m_live = false;
+			return {FSignal::Code::err};
 		}
-		return {FSignal::Code::ok};
-		/*if(!m_live) return {FSignal::Code::quit};
-		if(!(m_live &= !m_errors())) return {1};*/
-		// return {!m_live || !(m_live &= !m_errors())};
+		return {m_live ? FSignal::Code::ok : FSignal::Code::quit};
 	}
-	FSignal Window::handle(SDL_MouseMotionEvent const& ev) {
-		return {FSignal::Code::ok};
-		//return {0};
-	}
-	FSignal Window::handle(SDL_MouseButtonEvent const& ev) {
-		return {FSignal::Code::ok};
-		//return {0};
-	}
-	FSignal Window::handle(SDL_QuitEvent const& ev) { return {FSignal::Code::quit}; }
+	template<>
+	FSignal Window::handle(SDL_MouseMotionEvent const& ev)
+		{ return {FSignal::Code::ok}; }
+	template<>
+	FSignal Window::handle(SDL_MouseButtonEvent const& ev)
+		{ return {FSignal::Code::ok}; }
+	template<>
+	FSignal Window::handle(SDL_QuitEvent const& ev)
+		{ m_live = false; return { FSignal::Code::quit }; }
+	template<>
 	FSignal Window::handle(SDL_WindowEvent const& ev) {
+		if(!m_live) return {FSignal::Code::quit};
 		switch(ev.type) {
 			case SDL_WINDOWEVENT_CLOSE:
+				m_live = false;
 				return {FSignal::Code::quit};
-				//return {FSignal::Code::quit};
 			case SDL_WINDOWEVENT_RESIZED: {
 				int p1 = 0, p2 = 0;
 				SDL_GetWindowSize(m_win, &p1, &p2);
-				if(!p1 || !p2)
-					return {FSignal::Code::err};
-				if(p1 != ev.data1 || p2 != ev.data2)
-					return {FSignal::Code::err};
+				if(!p1 || !p2) {
+					m_live = false;
+					return { FSignal::Code::err };
+				}
+				if(p1 != ev.data1 || p2 != ev.data2) {
+					m_live = false;
+					return { FSignal::Code::err };
+				}
 				m_width = ev.data1;
 				m_height = ev.data2;
 				glViewport(0, 0, m_width, m_height);
@@ -69,9 +68,12 @@ namespace View {
 			} default: return {FSignal::Code::ok};
 		}
 	}
+	template<>
 	FSignal Window::handle(SDL_KeyboardEvent const& ev) {
 		switch(ev.keysym.scancode) {
-			case SDL_SCANCODE_ESCAPE: return {FSignal::Code::quit};
+			case SDL_SCANCODE_ESCAPE:
+				m_live = false;
+				return {FSignal::Code::quit};
 			default: return {FSignal::Code::ok};
 		}
 	}
@@ -80,11 +82,11 @@ namespace View {
 			return {FSignal::Code::err};
 		SDL_Event ev;
 		while(SDL_PollEvent(&ev)) {
-			auto res = call_handler(static_cast<
-				Abstract::Handler_t<Window, SDL_QuitEvent,
-				SDL_WindowEvent, SDL_MouseButtonEvent,
-				SDL_MouseMotionEvent, SDL_KeyboardEvent>&>(*this), ev);
-			if(res.error) return res;
+			auto res = call_handler(*this, ev);
+			if(res.error) {
+				m_live = false;
+				return res;
+			}
 		}
 		return {validate()};
 	}
@@ -98,7 +100,9 @@ namespace View {
 
 		int l_width = 0, l_height = 0;
 		SDL_GetWindowSize(m_win, &l_width, &l_height);
-		if(l_width <= 0 || l_height <= 0) return {FSignal::Code::err};
+		if(l_width <= 0 || l_height <= 0) {
+			return {FSignal::Code::err};
+		}
 		glViewport(0, 0, l_width, l_height);
 		m_width = l_width;
 		m_height = l_height;

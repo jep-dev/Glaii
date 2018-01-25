@@ -9,6 +9,7 @@
 ///@endcond
 
 #include "abstract.hpp"
+#include <iostream>
 
 namespace Abstract {
 
@@ -23,50 +24,49 @@ namespace Abstract {
 		operator bool(void) const { return error == 0; }
 	};
 
-	/** @brief CRTP subscription of type D to each event type. */
-	template<typename D, typename... E>
+	template<typename D>
 	struct Handler_t {
-		template<typename E1>
-		FSignal handle(E1 const& ev);
-	};
-	template<typename D, typename E0, typename... EN>
-	struct Handler_t<D, E0, EN...>: Handler_t<D, EN...> {
-		FSignal handle(E0 const& ev) {
-			return static_cast<D&>(*this).handle(ev);
+		template<typename T>
+		FSignal handle(T const& t) {
+			return static_cast<D&>(*this).handle(t);
 		}
-		using Handler_t<D, EN...>::handle;
+		/* {
+			return {FSignal::Code::ok};
+		}*/
+	private:
 	};
-
-	template<typename D, typename... EN, typename E0>
-	FSignal call_handler(Handler_t<D, EN...>& hnd, E0 const& ev) {
-		return {FSignal::Code::ok};
-	}
-	template<typename D, typename E0, typename... EN>
-	FSignal call_handler(Handler_t<D, E0, EN...>& hnd, E0 const& ev) {
-		return hnd.handle(ev);
-	}
 
 	/** @brief Calls individual dispatchers so the handler can opt into
 	 * individual event types. */
-	template<typename D, typename... EN>
-	FSignal call_handler(
-		Handler_t<D, EN...>& hnd, SDL_Event const& ev) {
-		//D& hnd, SDL_Event const& ev) {
+	template<typename T>
+	FSignal call_handler(Handler_t<T>& hnd, SDL_Event const& ev) {
 		switch(ev.type) {
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEBUTTONDOWN:
-				return call_handler(hnd, ev.button);
+				//return call_handler(hnd, ev.button);
+				return hnd.handle(ev.button);
+				//return hnd.handle(ev.button, 0);
 			case SDL_MOUSEMOTION:
-				return call_handler(hnd, ev.motion);
+				return hnd.handle(ev.motion);
+				//return call_handler(hnd, ev.motion);
+				//return hnd.handle(ev.motion, 0);
 			case SDL_WINDOWEVENT:
-				return call_handler(hnd, ev.window);
+				return hnd.handle(ev.window);
+				//return call_handler(hnd, ev.window);
+				//return hnd.handle(ev.window, 0);
 			case SDL_KEYDOWN:
-				return call_handler(hnd, ev.key);
+				return hnd.handle(ev.key);
+				//return call_handler(hnd, ev.key);
+				//return hnd.handle(ev.key, 0);
 			case SDL_CONTROLLERBUTTONDOWN:
 			case SDL_CONTROLLERBUTTONUP:
-				return call_handler(hnd, ev.cbutton);
+				return hnd.handle(ev.cbutton);
+				//return call_handler(hnd, ev.cbutton);
+				//return hnd.handle(ev.cbutton, 0);
 			case SDL_QUIT:
-				return call_handler(hnd, ev.quit);
+				return hnd.handle(ev.quit);
+				//return call_handler(hnd, ev.quit);
+				//return hnd.handle(ev.quit, 0);
 			default:
 				return {FSignal::Code::ok};
 		}
