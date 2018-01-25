@@ -4,6 +4,7 @@ doxymake=$(doxygen) -g
 
 # Input parameters
 DIR_DOC?=doc/
+FILE_DOC?=$(DIR_DOC)Doxyfile
 
 DOXY_HTML_EXTRA_STYLESHEET=doc/style.css
 DOXY_BUILTIN_STL_SUPPORT?=YES
@@ -23,17 +24,18 @@ DOXY_STRIP_FROM_PATH?=./
 
 DOXY_WARNINGS=NO
 
-override DOXY_INPUT+=$(DOXY_USE_MDFILE_AS_MAINPAGE) $(SRCS_EXE) $(SRCS_SO)
+override DOXY_INPUT+=$(DOXY_USE_MDFILE_AS_MAINPAGE) $(SRCS_EXE) $(SRCS_SO) \
+	$(call WPAT,HPP,*) $(call WPAT,TPP,*)
 
 V_DOXY_ALL=$(filter DOXY_%,$(.VARIABLES))
 V_DOXY_ALL_SUFFIXES=$(V_DOXY_ALL:DOXY_%=%)
 V_DOXY_REPLACEMENT=$(foreach V,$(V_DOXY_ALL_SUFFIXES),\\n$(V) = $(DOXY_$(V)))
 
-$(doc_file): Doxygen.mk $(DOXY_INPUT)
-	@$(doxymake) $(DIR_DOC)Doxyfile >/dev/null && \
-		echo $(strip $(V_DOXY_REPLACEMENT)) >> $(doc_file)
+$(FILE_DOC): Doxygen.mk $(DOXY_INPUT)
+	@$(doxymake) $(FILE_DOC) >/dev/null && \
+		echo $(strip $(V_DOXY_REPLACEMENT)) >> $(FILE_DOC)
 
-doc: Doxygen.mk $(DIR_DOC)Doxyfile
-	@$(doxygen) $(DIR_DOC)Doxyfile >/dev/null
-clean-doc:; $(RM) $(DIR_DOC)Doxyfile
+doc: Doxygen.mk $(FILE_DOC)
+	@$(doxygen) $(FILE_DOC) >/dev/null
+clean-doc:; $(RM) $(FILE_DOC)
 .PHONY: doc clean-doc
