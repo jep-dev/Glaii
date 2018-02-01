@@ -6,7 +6,7 @@ DEST_DIR:=
 EMPTY:=
 SPACE:=$(EMPTY) $(EMPTY)
 define BREAK
-$(1)
+$1
 $(1:%=  )  
 endef
 BR:=$(call BREAK,\)#) <- Backslashes can confuse highlighters/validaters
@@ -42,7 +42,7 @@ PAT_TD=$(1:%=$(DEST_DIR)obj/%.Td)
 PAT_O=$(1:%=obj/%.o)
 PAT_SO=$(1:%=lib/lib%.so)
 PAT_EXE=$(1:%=$(DEST_DIR)bin/%)
-WPAT=$(wildcard $(call PAT_$(1),$2))
+WPAT=$(wildcard $(call PAT_$1,$2))
 
 # Pattern inverses; both paths are taken so that the pipeline is flexible;
 # sources and targets can be added/removed/etc. beyond their automatic
@@ -66,7 +66,7 @@ XDO_EA2=$(foreach X,$(call XDO_EA,$2,$3),$(call DO_EA,$1,$X))
 # Maps one file path to another through patterns
 REPAT=$(call PAT_$2,$(call UNPAT_$1,$3))
 # Maps one file path to several
-REPAT_EA=$(call DO_EA2,$(2:%=PAT_%),UNPAT_$(1),$3)
+REPAT_EA=$(call DO_EA2,$(2:%=PAT_%),UNPAT_$1,$3)
 
 # Convenience compositions with wildcard
 WREPAT=$(wildcard $(call REPAT,$1,$2,$3))
@@ -85,6 +85,7 @@ CONFIG_SO=$(call PKG_CONFIG,--libs,$1)
 
 # Preserve alternate application sources from configuration
 override SRCS_EXE+=$(call WPAT,APP,*)
+override HDRS_EXE:=$(wildcard $(SRCS_EXE:%.cpp=%.hpp %.tpp))
 # Only remove this if app and library byproducts are separated!
 #   obj/.o,.d,.Td files will collide until the next Makefile version.
 override SRCS_SO:=$(filter-out $(SRCS_EXE),$(SRCS_SO) $(call WPAT,CPP,*))
@@ -98,16 +99,12 @@ TARGET?=$(firstword $(FILES_EXE))
 default: $(TARGET) $(COMPLETE)
 
 # Examples - uncomment and make 'vars-TESTS'
-E:=$(NAMES_EXE)
-EA:=$(FILES_EXE)
-EB:=$(SRCS_EXE)
-L:=$(NAMES_SO)
-LA:=$(FILES_SO)
-LB:=$(SRCS_SO)
-#override Y:=$(foreach X,$Z,\
-#	$(eval Y:=$(filter-out $(X),$(Y)) $(X)))$(Y))
-
-$(eval TESTS:=$(foreach N,1 2,TEST$(N)))
+#E:=$(NAMES_EXE)
+#EA:=$(FILES_EXE)
+#EB:=$(SRCS_EXE)
+#L:=$(NAMES_SO)
+#LA:=$(FILES_SO)
+#LB:=$(SRCS_SO)
 #$(eval TEST1:=$(call DO_EA,PAT_HPP PAT_CPP,$L))
 #$(eval TEST2:=$(call WDO_EA,PAT_HPP PAT_CPP PAT_APP,$L))
 #$(eval TEST3:=$(call XDO_EA,PAT_HPP PAT_CPP,$L))
@@ -115,35 +112,32 @@ $(eval TESTS:=$(foreach N,1 2,TEST$(N)))
 #$(eval TEST5:=$(call XDO_EA2,dir notdir,PAT_APP PAT_HPP,$L))
 #$(eval TEST6:=$(join $E,$(join $(EA:%=:%),$(EB))))
 #$(eval TEST7:=$(call CROSS,SO,CPP,HPP,$(LA)))
-$(eval TEST8:=$(call REPAT_EA,SO,HPP TPP,$(LA)))
+#$(eval TEST8:=$(call REPAT_EA,SO,HPP TPP,$(LA)))
 #$(eval TEST9:=$(call WREPAT_EA,SO,HPP TPP,$(LA)))
-$(eval TESTS:=$(foreach N,1 3 6 7 8 9,TEST$(N)))
-
+#$(eval TESTS:=$(foreach N,1 3 6 7 8 9,TEST$N))
 
 $(foreach R,$(addsuffix :,$(call REPAT,APP,D,$(SRCS_EXE)))\
-	$(call CROSS,APP,O,APP,$(SRCS_EXE)),$(eval $(strip $R)))
-$(foreach R,$(addsuffix :,$(call REPAT,APP,D,$(SRCS_EXE)))\
-	$(call CROSS,APP,O,APP,$(SRCS_EXE)),$(eval $(strip $R)))
+	$(addsuffix :,$(call REPAT,CPP,D,$(SRCS_SO)))\
+	$(call CROSS,APP,O,APP,$(SRCS_EXE)) $(call CROSS,SO,O,CPP,$(SRCS_SO)),\
+	$(eval $(strip $R)))
 $(foreach R,$(call CROSS,APP,EXE,O,$(SRCS_EXE)),$(eval $(strip $R);\
 	$(CXX) $(LDLIBS) $(BR) -o $$@ $$< $(LDFLAGS) $(NAMES_SO:%=-l%)))
-$(foreach R,$(addsuffix :,$(call REPAT,CPP,D,$(SRCS_SO)))\
-	$(call CROSS,SO,O,CPP,$(SRCS_SO)),$(eval $(strip $R)))
 $(foreach R,$(call CROSS,CPP,SO,O,$(SRCS_SO)),$(eval $(strip $R);\
 	$(CXX) $(LDLIBS) $$< -shared $(BR) -o $$@ $(LDFLAGS)))
+$(foreach N,$(NAMES_EXE) $(NAMES_SO),\
+	$(eval $(call PAT_O,$N): \
+	$(wildcard $(call PAT_HPP,$N) $(call WPAT_TPP,$N))))
 
 $(foreach N,$(call REPAT,APP,O,$(SRCS_EXE)),\
 	$(eval $N:$(call REPAT_EA,O,APP D,$N) $(FILES_SO);\
-	$(CXX) -MT $$@ -MMD -MP -MF $(call REPAT,O,TD,$N)\
-	$(CXXFLAGS) -c $$<$(BR)-o $$@\
-	&& mv $(call REPAT_EA,O,TD D,$N) && touch $$@))
+	$(CXX) -MT $$@ -MMD -MP -MF $(call REPAT,O,TD,$N) $(CXXFLAGS) -c $$<\
+	$(BR)-o $$@ && mv $(call REPAT_EA,O,TD D,$N) && touch $$@))
 
 $(foreach N,$(call REPAT,CPP,O,$(SRCS_SO)),\
 	$(eval $N:$(call REPAT_EA,O,CPP D,$N);\
 	$(CXX) -MT $$@ -MMD -MP -MF $(call REPAT,O,TD,$N) $(CXXFLAGS)\
 	$(BR)-fPIC -c $$< -o $$@\
 	$(BR)&& mv $(call REPAT_EA,O,TD D,$N) && touch $$@))
-
-$(foreach N,$(NAMES_SO),$(eval $(call MAKE_SO,$(N))))
 
 $(COMPLETE): $(FILES_SO) $(FILES_EXE); @echo $(CXXFLAGS) > $@
 .PRECIOUS: %.d $(COMPLETE)
