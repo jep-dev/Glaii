@@ -5,6 +5,7 @@
 #define EVENTS_HPP
 
 ///@cond
+#include <string>
 #include <SDL2/SDL_events.h>
 ///@endcond
 
@@ -15,10 +16,20 @@ namespace Abstract {
 			ok = 0, quit, err
 		} Code;
 		Code error;
-		const char *message = "(default)";
+		std::string message = "";
 		operator bool(void) const { return error == ok; }
 		bool operator<(Code const& c) { return error < c; }
 		bool operator<(FSignal const& s) { return error < s.error; }
+		template<typename S>
+		friend S& operator<<(S& os, FSignal const& fs) {
+			constexpr const char *labels[] = {
+				"OK", "quit", "error"
+			};
+			os << labels[fs.error];
+			if(fs.message.length())
+				os << ": " << fs.message;
+			return os;
+		}
 	};
 
 	template<typename D>
