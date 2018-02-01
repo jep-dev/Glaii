@@ -45,8 +45,8 @@ FSignal Window::handle(SDL_MouseButtonEvent const& ev) {
 
 template <>
 FSignal Window::handle(SDL_QuitEvent const& ev) {
-	if (m_live > FSignal::Code::quit) return m_live = {FSignal::Code::quit};
-	return m_live;
+	if (m_live > FSignal::Code::quit) return m_live;
+	return m_live = {FSignal::Code::quit};
 }
 template <>
 FSignal Window::handle(SDL_WindowEvent const& ev) {
