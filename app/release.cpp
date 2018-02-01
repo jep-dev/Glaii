@@ -14,6 +14,7 @@
 #include "window.hpp"
 #include "glsl.hpp"
 #include "streams.hpp"
+#include "stopwatch.hpp"
 
 #include "geometry.hpp"
 #include "model.hpp"
@@ -50,59 +51,32 @@ bool run(std::ostream &dest, int n_frames) {
 		{GLCTX(MAJOR_VERSION), 3}, {GLCTX(MINOR_VERSION), 3},
 		{SDL_GL_DOUBLEBUFFER, 1}, {SDL_GL_DEPTH_SIZE, 24}
 	});
-	if(!win) {
-		dest << win;
-		return false;
-	}
+
+	if(!win.validate()) return dest << win, false;
 
 	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
-	if(!p.build()) {
-		dest << "Could not build shader program\n"
-			<< p.info();
-		return false;
-	}
+	if(!p.build()) return dest << "Could not build shader program\n"
+			<< p.info(), false;
+
 	p.use();
-
 	auto id_mvp = p.uniform("mvp");
-	if(id_mvp == -1) {
-		dest << "MVP uniform not found!";
-		return false;
-	}
+	if(id_mvp == -1) return dest << "MVP uniform not found!", false;
 
-	unsigned frame = 0, samples = 60;
-	float rollsum = 0, store[samples] = {0};
-	auto tStart = SDL_GetPerformanceCounter(), t0 = tStart;
-	endl(dest << "FPS during " << samples << " frames:");
-	dest << std::setprecision(5);
-	FSignal res = {FSignal::Code::ok};
-	while(win) {
+	FSignal res;
+	unsigned frame = 0, interval = 60;
+
+	dest << std::setprecision(4);
+	auto watch = stopwatch(&perf_rate<float>);
+	while(watch.start(), res = win.validate()) {
 		res = win.draw(frame, id_mvp);
-		if(!res) break;
-		auto t1 = SDL_GetPerformanceCounter();
-		auto index = ++frame % samples;
-		auto freq = SDL_GetPerformanceFrequency();
-		auto fps = float(freq)/(t1-t0);
-		rollsum += fps - store[index];
-		store[index] = fps;
-		if((frame > samples) && !(frame % samples)) {
-			float mean = rollsum/samples, dev = 0, dev2 = 0;
-			for(unsigned i = 0; i < samples; i++) {
-				auto diff = mean - store[i];
-				dev2 += diff*diff;
-			}
-			dev = sqrt(dev2/samples);
-			dest << "Average: " << setw(6) << mean
-				<< "; std. deviation: " << dev << "\r";
-			(frame % (samples*8)) ? flush(dest) : endl(dest);
-		}
-		t0 = t1;
+		watch.pause();
+		if(!(frame % interval))
+			std::cout << watch << std::endl;
+		frame++;
 	}
-	dest << "Window exited with status " << (unsigned)res.error
-		<< " (living=0, failing=1, quitting=2)\n" << win;
-	// 'Validate' step still necessary as a post-mortem, since false means
-	// both 'quit' and 'fail' -- see note in src/Window.cpp
-	return win.validate();
+	dest << "\nWindow exited; " << res << '\n' << win;
+	return res.error == FSignal::Code::quit;
 }
 
 int main(int argc, const char *argv[]) {
