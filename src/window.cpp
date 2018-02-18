@@ -4,12 +4,13 @@
 #include "window.hpp"
 #include "view.hpp"
 
-#include <SDL2/SDL.h>
-
+///@cond
+#include <SDL.h>
 #include <glbinding/Binding.h>
 #include <glbinding/ContextInfo.h>
 #include <glbinding/Meta.h>
 #include <glbinding/Version.h>
+///@endcond
 
 namespace View {
 using namespace gl;

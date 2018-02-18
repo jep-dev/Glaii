@@ -11,13 +11,23 @@
 #include <SDL_timer.h>
 ///@endcond
 
-
+/** @brief Shorthand for SDL's performance counter, which increases
+ * monotonically and provides an accurate measurement of duration combined
+ * with perf_freq. */
 long perf_ticks(void) { return SDL_GetPerformanceCounter(); }
+/** @brief Shorthand for SDL's performance frequency, which provides the
+ * ratio between counter ticks and real time. */
 long perf_freq(void) { return SDL_GetPerformanceFrequency(); }
 
+/** @brief Performance metric; useful only when subtracted from another call
+ * to the same function. Note that each measurement is scaled by the current
+ * frequency as opposed to two counter checks with one frequency check. The
+ * most accurate approach to duration measurement might be to integrate
+ * smaller intervals. */
 template<typename T = float>
 T perf_rate(void) { return perf_ticks() / T(perf_freq()); }
 
+/** @brief A type used to measure durations with simple controls. */
 struct Sample {
 	float (*measure)(void);
 
@@ -31,6 +41,9 @@ protected:
 	bool running = false, started = false;
 };
 
+/** @brief A type used to buffer measurements taken from the Sample type and
+ * provide an average and standard deviation of frames/events per second
+ * based on its contents. */
 struct Stopwatch {
 	float (*measure)(void);
 	unsigned max_samples;
@@ -59,6 +72,9 @@ protected:
 	Sample sample;
 };
 
+/** @brief Creates a stopwatch from the given function, which may not have
+ * the same signature as (but must be convertible to) the function used by
+ * Sample to take measurements of the current performance rate. */
 template<typename R, typename... T> auto stopwatch(R && r, T &&... t) {
 	return Stopwatch(std::forward<R>(r), std::forward<T>(t)...);
 }

@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 ///@endcond
 
 #include "window.hpp"
