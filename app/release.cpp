@@ -5,12 +5,14 @@
  *  proofs of concepts before integration into the appropriate module. */
 
 ///@cond
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <SDL.h>
 ///@endcond
 
+#include "release.hpp"
 #include "window.hpp"
 #include "glsl.hpp"
 #include "streams.hpp"
@@ -18,24 +20,6 @@
 
 #include "geometry.hpp"
 #include "model.hpp"
-
-#ifndef GLSL_ROOT
-#define GLSL_ROOT "share/"
-#endif
-
-#ifndef GLSL_VERT
-#define GLSL_VERT GLSL_ROOT "default.vert"
-#endif
-
-#ifndef GLSL_FRAG
-#define GLSL_FRAG GLSL_ROOT "default.frag"
-#endif
-
-/* TODO Remove convenience macro? GL prefix is more descriptive but
- * doesn't match GL_[constant] or GL[type] conventions */
-#ifndef GLCTX
-#define GLCTX(X) SDL_GL_CONTEXT_ ## X
-#endif
 
 bool run(std::ostream &dest, int n_frames) {
 	using namespace View;
@@ -56,12 +40,13 @@ bool run(std::ostream &dest, int n_frames) {
 
 	Streams::Cutter c0(GLSL_VERT), c1(GLSL_FRAG);
 	Program<GL_VERTEX_SHADER, GL_FRAGMENT_SHADER> p {c0, c1};
-	if(!p.build()) return dest << "Could not build shader program\n"
-			<< p.info(), false;
+	if(!p.build())
+		return dest << "Could not build shader\n" << p.info(), false;
 
 	p.use();
 	auto id_mvp = p.uniform("mvp");
-	if(id_mvp == -1) return dest << "MVP uniform not found!", false;
+	if(id_mvp == -1)
+		return dest << "MVP uniform not found!\n", false;
 
 	FSignal res;
 	unsigned frame = 0, interval = 60;
@@ -72,7 +57,7 @@ bool run(std::ostream &dest, int n_frames) {
 		res = win.draw(frame, id_mvp);
 		watch.pause();
 		if(!(frame % interval))
-			std::cout << watch << std::endl;
+			dest << watch << endl;
 		frame++;
 	}
 	dest << "\nWindow exited; " << res << '\n' << win;
@@ -83,15 +68,40 @@ int main(int argc, const char *argv[]) {
 	using namespace View;
 	using std::cout;
 	using std::endl;
+	using std::flush;
+	using std::chrono::duration;
+	using std::chrono::seconds;
 
-	int init = 0, init_err = 0, ran = 0, run_err = 0,
-		modules = SDL_INIT_VIDEO, n_frames = 20,
-		started = (SDL_Init(modules), SDL_WasInit(0) & modules);
-	if(init = (modules == started)) {
-		cout << "Beginning test." << endl;
-		cout << (run(cout, 30) ? "Passed" : "Failed")
-			<< " test." << endl;
-	} else init_err = 1, cout << "abort." << endl;
+	int n_frames = 20,
+		mods_in = SDL_INIT_VIDEO,
+		mods_err, mods_out, run_out;
+
+	if(!(mods_in &= SDL_INIT_EVERYTHING))
+		cout << "# Deferring SDL init." << endl;
+	else cout << "# Starting SDL... " << flush;
+
+	SDL_Init(mods_in);
+	mods_out = SDL_WasInit(0);
+	mods_in |= mods_out;           // VIDEO implies EVENTS, etc. so this...
+	mods_err = mods_in ^ mods_out; // ... prevents false positives here.
+
+	if(mods_err) {
+		cout << (mods_err > 1 ?  "several modules " : "a module ")
+			<< "failed to load!" << endl;
+
+		std::ostringstream sdl_oss;
+		auto pos = sdl_oss.tellp();
+		sdl_oss << SDL_GetError();
+		if(pos > sdl_oss.tellp())
+			cout << "## SDL: " << sdl_oss.str() << endl;
+	} else {
+		cout << "done.\n# Beginning test..." << endl;
+		auto t0 = std::chrono::system_clock::now();
+		run_out = run(cout, 30);
+		duration<float> dt = std::chrono::system_clock::now() - t0;
+		cout << "# Test " << (run_out ? "passed" : "failed") << " after "
+			<< dt.count() << " seconds." << endl;
+	}
+
 	SDL_Quit();
-	return ((init_err << 1) | run_err);
 }
